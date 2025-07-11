@@ -37,54 +37,6 @@ export default function Home({ navigation }: { navigation: any }) {
     }
   };
 
-  const services = [
-    {
-      id: 'consulting',
-      title: 'Consulting',
-      subtitle: 'for Schools',
-      icon: 'school',
-      color: '#2E7D32',
-      tips: [
-        '📚 Implement environmental education programs in the curriculum',
-        '♻️ Organize waste separation in classrooms and cafeterias',
-        '🌱 Create a school garden for practical biology lessons',
-        '💡 Install energy-saving lights and motion sensors',
-        '🚌 Encourage use of public transport and bicycles',
-        '📋 Conduct regular environmental audits of the school'
-      ]
-    },
-    {
-      id: 'recycling',
-      title: 'Recycling',
-      subtitle: 'Services',
-      icon: 'recycling',
-      color: '#1976D2',
-      tips: [
-        '🗂️ Separate waste into plastic, paper, glass and organic',
-        '♻️ Find the nearest recycling centers in your area',
-        '📱 Use mobile apps to locate recycling points',
-        '🔋 Drop off batteries and electronics at special collection points',
-        '👔 Donate old clothes to textile collection centers',
-        '🏠 Compost organic waste for plant fertilizer'
-      ]
-    },
-    {
-      id: 'ecodesign',
-      title: 'Eco Design',
-      subtitle: 'Services',
-      icon: 'eco',
-      color: '#F57C00',
-      tips: [
-        '🌿 Use natural and recycled materials',
-        '💡 Design with energy efficiency in mind',
-        '🏗️ Choose durable and repairable solutions',
-        '🎨 Apply minimalist design to save resources',
-        '🌍 Consider the entire product lifecycle',
-        '🔄 Plan for potential reuse and recycling'
-      ]
-    }
-  ];
-
   const openServiceModal = (service: any) => {
     setSelectedService(service);
     setModalVisible(true);
@@ -230,25 +182,6 @@ export default function Home({ navigation }: { navigation: any }) {
             </TouchableOpacity>
           </View>
 
-          {/* Services */}
-          <View style={styles.servicesRow}>
-            {services.map((service, index) => (
-              <TouchableOpacity 
-                key={service.id}
-                style={[styles.serviceCard]} 
-                activeOpacity={0.8}
-                onPress={() => openServiceModal(service)}
-              >
-                <View style={[styles.serviceIconContainer, { backgroundColor: service.color }]}>
-                  <MaterialIcons name={service.icon as any} size={24} color="#fff" />
-                </View>
-                <Text style={styles.serviceTitle}>{service.title}</Text>
-                <Text style={styles.serviceSubtitle}>{service.subtitle}</Text>
-                <View style={[styles.serviceAccent, { backgroundColor: service.color }]} />
-              </TouchableOpacity>
-            ))}
-          </View>
-          
           {/* Our Campaign */}
           <View style={styles.campaignBlock}>
             <View style={styles.sectionHeader}>
