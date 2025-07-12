@@ -24,16 +24,16 @@ export default function FirstPage({ navigation }: FirstPageProps) {
           </Text>
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>8.2</Text>
-              <Text style={styles.statLabel}>Million Tons{"\n"}plastic waste</Text>
+              <Text style={styles.statValue}>420</Text>
+              <Text style={styles.statLabel}>ppm CO₂{"\n"}in atmosphere</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>1,54</Text>
-              <Text style={styles.statLabel}>Million Species{"\n"}endangered</Text>
+              <Text style={styles.statValue}>1.1°C</Text>
+              <Text style={styles.statLabel}>Global{"\n"}warming</Text>
             </View>
             <View style={styles.statBox}>
-              <Text style={styles.statValue}>+1°C</Text>
-              <Text style={styles.statLabel}>Temperature{"\n"}increases per year</Text>
+              <Text style={styles.statValue}>12M</Text>
+              <Text style={styles.statLabel}>km² Arctic{"\n"}ice lost</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.button} onPress={() => navigation.replace('Home')}>
@@ -102,8 +102,10 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
     marginHorizontal: 4,
+    height: 80,
     elevation: 3,
     shadowColor: '#000',
     shadowOpacity: 0.10,

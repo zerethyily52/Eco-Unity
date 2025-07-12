@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, Modal, Animated, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCampaignContext } from '../App';
 import EnvironmentalDataService, { AirQualityData } from '../services/EnvironmentalDataService';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 export default function Home({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState('home');
@@ -13,6 +16,37 @@ export default function Home({ navigation }: { navigation: any }) {
   const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(null);
   const [isLoadingAirQuality, setIsLoadingAirQuality] = useState(true);
   const { isJoined } = useCampaignContext();
+
+  // Animation values
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const slideAnim = useState(new Animated.Value(50))[0];
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
+
+  const getGradientColors = (status: string): [string, string] => {
+    const gradients = {
+      good: ['#4CAF50', '#81C784'] as [string, string],
+      moderate: ['#FFEB3B', '#FFF176'] as [string, string],  
+      unhealthy_sg: ['#FF9800', '#FFB74D'] as [string, string],
+      unhealthy: ['#F44336', '#EF5350'] as [string, string],
+      very_unhealthy: ['#9C27B0', '#BA68C8'] as [string, string],
+      hazardous: ['#8BC34A', '#AED581'] as [string, string],
+    };
+    return gradients[status as keyof typeof gradients] || ['#666', '#999'];
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -37,6 +71,8 @@ export default function Home({ navigation }: { navigation: any }) {
     }
   };
 
+
+
   const openServiceModal = (service: any) => {
     setSelectedService(service);
     setModalVisible(true);
@@ -47,44 +83,23 @@ export default function Home({ navigation }: { navigation: any }) {
     setSelectedService(null);
   };
 
-  const homeCampaigns = [
-    {
-      title: 'Urban Forest Project',
-      description: 'Help us plant and care for trees in city parks and streets.',
-      image: { uri: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80' },
-      details: 'Join our urban forest project to make the city greener. We organize regular tree planting and care events. Everyone is welcome!',
-    },
-    {
-      title: 'Eco School Program',
-      description: 'Support eco-education and recycling in local schools.',
-      image: { uri: 'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80' },
-      details: 'Become a volunteer in our Eco School Program. Teach kids about recycling, energy saving, and nature protection.',
-    },
-    {
-      title: 'Clean Beach Action',
-      description: 'Join us to clean up beaches and protect marine life.',
-      image: { uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' },
-      details: 'Participate in our monthly beach cleanups. Help us collect plastic and other waste to keep our coasts beautiful and safe for wildlife.',
-    },
-    {
-      title: 'Green Transport Week',
-      description: 'Promote cycling, walking, and public transport in your city.',
-      image: { uri: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80' },
-      details: 'Take part in Green Transport Week! Use a bike, walk, or take public transport. Share your experience and inspire others.',
-    },
-  ];
 
-  const handleCampaignPress = (campaign: any) => {
-    // Просто переходим к деталям кампании, не присоединяемся автоматически
-    navigation.navigate('CampaignDetail', { campaign });
-  };
+
+
 
   return (
     <View style={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.topBarText}>EcoUnity</Text>
-        <Text style={styles.topBarSubtext}>Together for a Greener Future</Text>
-      </View>
+      <LinearGradient
+        colors={['#2E7D32', '#4CAF50', '#66BB6A']}
+        style={styles.topBarGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <Animated.View style={[styles.topBarContent, { opacity: fadeAnim }]}>
+          <Text style={styles.topBarText}>🌍 EcoUnity</Text>
+          <Text style={styles.topBarSubtext}>Together for a Greener Future</Text>
+        </Animated.View>
+      </LinearGradient>
       <View style={styles.flexGrowContent}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Why Eco Unity? */}
@@ -118,122 +133,140 @@ export default function Home({ navigation }: { navigation: any }) {
             </View>
           </View>
           
-          {/* Air Quality Section */}
-          <View style={styles.airQualitySection}>
-            <Text style={styles.sectionTitle}>Air Quality Today</Text>
-            <TouchableOpacity 
-              style={styles.airQualityCard}
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate('EnvironmentalDashboard')}
-            >
-              {isLoadingAirQuality ? (
-                <View style={styles.loadingContainer}>
-                  <MaterialIcons name="hourglass-empty" size={24} color="#3CB371" />
-                  <Text style={styles.loadingText}>Loading air quality data...</Text>
-                </View>
-              ) : airQualityData ? (
-                <>
-                  <View style={styles.airQualityHeader}>
-                    <View style={styles.airQualityLeft}>
-                      <Text style={styles.airQualityCity}>{airQualityData.city}</Text>
-                      <Text style={styles.airQualityDescription}>
-                        {EnvironmentalDataService.getAQIDescription(airQualityData.status)}
-                      </Text>
+          {/* Environmental Dashboard */}
+          <View style={styles.environmentalSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.mainSectionTitle}>Environmental Dashboard</Text>
+              <Text style={styles.sectionSubtitle}>Real-time environmental data for your area</Text>
+            </View>
+            
+            {/* Air Quality Main Card */}
+            <Animated.View style={[styles.mainAirQualityCard, { 
+              opacity: fadeAnim, 
+              transform: [{ translateY: slideAnim }] 
+            }]}>
+              <LinearGradient
+                colors={['#ffffff', '#f8fff8', '#ffffff']}
+                style={styles.cardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                {isLoadingAirQuality ? (
+                  <View style={styles.mainLoadingContainer}>
+                    <View style={styles.loadingIconContainer}>
+                      <MaterialIcons name="hourglass-empty" size={32} color="#3CB371" />
                     </View>
-                    <View style={[styles.aqiCircle, { backgroundColor: EnvironmentalDataService.getAQIColor(airQualityData.status) }]}>
-                      <Text style={styles.aqiValue}>{airQualityData.aqi}</Text>
-                      <Text style={styles.aqiLabel}>AQI</Text>
-                    </View>
+                    <Text style={styles.mainLoadingText}>Loading environmental data...</Text>
                   </View>
-                  <View style={styles.pollutantRow}>
+                ) : airQualityData ? (
+                  <>
+                    {/* Header with AQI */}
+                    <View style={styles.mainAirQualityHeader}>
+                      <View style={styles.mainAirQualityLeft}>
+                        <Text style={styles.mainAirQualityCity}>🌍 {airQualityData.city}</Text>
+                        <Text style={styles.mainAirQualityStatus}>
+                          Air Quality: {EnvironmentalDataService.getAQIDescription(airQualityData.status)}
+                        </Text>
+                        <Text style={styles.airQualityTimestamp}>Last updated: {new Date().toLocaleTimeString()}</Text>
+                      </View>
+                      <View style={styles.aqiCircleContainer}>
+                        <LinearGradient
+                          colors={getGradientColors(airQualityData.status)}
+                          style={styles.aqiGradientCircle}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                        >
+                          <Text style={styles.aqiValue}>{airQualityData.aqi}</Text>
+                          <Text style={styles.aqiLabel}>AQI</Text>
+                        </LinearGradient>
+                      </View>
+                    </View>
+
+                  {/* Detailed Pollutants Grid */}
+                  <View style={styles.pollutantsGrid}>
                     {airQualityData.pollution.pm25 && (
-                      <View style={styles.pollutantItem}>
-                        <Text style={styles.pollutantLabel}>PM2.5</Text>
-                        <Text style={styles.pollutantValue}>{airQualityData.pollution.pm25}</Text>
+                      <View style={styles.pollutantDetailItem}>
+                        <View style={styles.pollutantIcon}>
+                          <MaterialIcons name="grain" size={20} color="#FF6B6B" />
+                        </View>
+                        <Text style={styles.pollutantDetailLabel}>PM2.5</Text>
+                        <Text style={styles.pollutantDetailValue}>{airQualityData.pollution.pm25} μg/m³</Text>
+                        <Text style={styles.pollutantDetailDesc}>Fine particles</Text>
                       </View>
                     )}
                     {airQualityData.pollution.pm10 && (
-                      <View style={styles.pollutantItem}>
-                        <Text style={styles.pollutantLabel}>PM10</Text>
-                        <Text style={styles.pollutantValue}>{airQualityData.pollution.pm10}</Text>
+                      <View style={styles.pollutantDetailItem}>
+                        <View style={styles.pollutantIcon}>
+                          <MaterialIcons name="blur-circular" size={20} color="#FF9500" />
+                        </View>
+                        <Text style={styles.pollutantDetailLabel}>PM10</Text>
+                        <Text style={styles.pollutantDetailValue}>{airQualityData.pollution.pm10} μg/m³</Text>
+                        <Text style={styles.pollutantDetailDesc}>Coarse particles</Text>
                       </View>
                     )}
                     {airQualityData.pollution.o3 && (
-                      <View style={styles.pollutantItem}>
-                        <Text style={styles.pollutantLabel}>O₃</Text>
-                        <Text style={styles.pollutantValue}>{airQualityData.pollution.o3}</Text>
+                      <View style={styles.pollutantDetailItem}>
+                        <View style={styles.pollutantIcon}>
+                          <MaterialIcons name="wb-sunny" size={20} color="#3CB371" />
+                        </View>
+                        <Text style={styles.pollutantDetailLabel}>O₃</Text>
+                        <Text style={styles.pollutantDetailValue}>{airQualityData.pollution.o3} μg/m³</Text>
+                        <Text style={styles.pollutantDetailDesc}>Ground ozone</Text>
+                      </View>
+                    )}
+                    {airQualityData.pollution.co && (
+                      <View style={styles.pollutantDetailItem}>
+                        <View style={styles.pollutantIcon}>
+                          <MaterialIcons name="local-gas-station" size={20} color="#666" />
+                        </View>
+                        <Text style={styles.pollutantDetailLabel}>CO</Text>
+                        <Text style={styles.pollutantDetailValue}>{airQualityData.pollution.co} μg/m³</Text>
+                        <Text style={styles.pollutantDetailDesc}>Carbon monoxide</Text>
                       </View>
                     )}
                   </View>
-                  <View style={styles.airQualityFooter}>
-                    <MaterialIcons name="info-outline" size={16} color="#666" />
-                    <Text style={styles.airQualityFooterText}>Tap for detailed environmental data</Text>
+
+                  {/* Health Recommendations */}
+                  <View style={styles.healthRecommendations}>
+                    <View style={styles.recommendationHeader}>
+                      <MaterialIcons name="health-and-safety" size={20} color="#3CB371" />
+                      <Text style={styles.recommendationTitle}>Health Recommendations</Text>
+                    </View>
+                                         <Text style={styles.recommendationText}>
+                       {airQualityData.aqi <= 50 
+                         ? "🟢 Great air quality! Perfect for outdoor activities and exercise."
+                         : airQualityData.aqi <= 100
+                         ? "🟡 Moderate air quality. Sensitive individuals should limit prolonged outdoor activities."
+                         : airQualityData.aqi <= 150
+                         ? "🟠 Unhealthy for sensitive groups. Children and elderly should limit outdoor exposure."
+                         : "🔴 Unhealthy air quality. Everyone should avoid outdoor activities."}
+                     </Text>
+                  </View>
+
+                  {/* Action Button */}
+                  <View style={styles.actionButtonContainer}>
+                    <TouchableOpacity style={styles.detailsActionButton} onPress={() => navigation.navigate('EnvironmentalDashboard')}>
+                      <MaterialIcons name="analytics" size={18} color="#3CB371" />
+                      <Text style={styles.detailsActionText}>View Details</Text>
+                    </TouchableOpacity>
                   </View>
                 </>
               ) : (
-                <View style={styles.errorContainer}>
-                  <MaterialIcons name="cloud-off" size={24} color="#FF6B6B" />
-                  <Text style={styles.errorText}>Unable to load air quality data</Text>
+                <View style={styles.mainErrorContainer}>
+                  <MaterialIcons name="cloud-off" size={32} color="#FF6B6B" />
+                  <Text style={styles.mainErrorText}>Unable to load environmental data</Text>
+                  <Text style={styles.errorSubtext}>Please check your internet connection</Text>
                   <TouchableOpacity onPress={loadAirQualityData} style={styles.retryButton}>
+                    <MaterialIcons name="refresh" size={16} color="#fff" />
                     <Text style={styles.retryText}>Retry</Text>
                   </TouchableOpacity>
                 </View>
               )}
-            </TouchableOpacity>
+              </LinearGradient>
+            </Animated.View>
           </View>
 
-          {/* Our Campaign */}
-          <View style={styles.campaignBlock}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Our Campaign</Text>
-              <Text style={styles.sectionSubtitle}>Join our environmental initiatives</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.campaignScroll}
-              contentContainerStyle={styles.campaignScrollContent}
-            >
-              {homeCampaigns.map((c, i) => {
-                const joined = isJoined(c.title);
-                return (
-                  <TouchableOpacity
-                    key={i}
-                    style={[styles.campaignCard, joined && styles.campaignCardJoined]}
-                    onPress={() => handleCampaignPress(c)}
-                    activeOpacity={0.85}
-                  >
-                    <View style={styles.campaignImageContainer}>
-                      <Image source={c.image} style={styles.campaignImg} resizeMode="cover" />
-                      {joined && (
-                        <View style={styles.joinedBadge}>
-                          <MaterialIcons name="verified" size={24} color="#fff" />
-                          <Text style={styles.joinedBadgeText}>JOINED</Text>
-                        </View>
-                      )}
-                      <View style={styles.campaignOverlay}>
-                        <MaterialIcons name={joined ? "check" : "arrow-forward"} size={18} color="#fff" />
-                      </View>
-                    </View>
-                    <View style={styles.campaignContent}>
-                      <Text style={[styles.campaignTitle, joined && styles.campaignTitleJoined]}>{c.title}</Text>
-                      <Text style={styles.campaignDesc}>{c.description}</Text>
-                      <View style={styles.campaignFooter}>
-                        <Text style={[styles.joinText, joined && styles.joinTextCompleted]}>
-                          {joined ? "Participating" : "Join Now"}
-                        </Text>
-                        <MaterialIcons 
-                          name={joined ? "verified" : "trending-up"} 
-                          size={16} 
-                          color={joined ? "#2E7D32" : "#3CB371"} 
-                        />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
+
           <View style={{ height: 48 }} />
         </ScrollView>
       </View>
@@ -283,25 +316,36 @@ export default function Home({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F6FFF6' },
-  topBar: {
+  
+  // Enhanced Top Bar Styles
+  topBarGradient: {
     height: Platform.OS === 'android' ? 110 : 120,
-    backgroundColor: '#247A4D',
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingBottom: 10,
     paddingTop: Platform.OS === 'android' ? 40 : 50,
     marginBottom: 8,
   },
+  topBarContent: {
+    alignItems: 'center',
+  },
   topBarText: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   topBarSubtext: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 15,
     marginTop: 4,
+    opacity: 0.9,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   flexGrowContent: {
     flex: 1,
@@ -602,127 +646,273 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   
-  // Air Quality Section Styles
-  airQualitySection: {
+  // Environmental Dashboard Section Styles
+  environmentalSection: {
     marginHorizontal: 18,
     marginBottom: 18,
   },
-  airQualityCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    marginTop: 8,
-    elevation: 3,
+  mainSectionTitle: {
+    fontSize: 22,
+    fontWeight: 'bold', 
+    color: '#222',
+    marginBottom: 4,
+  },
+  mainAirQualityCard: {
+    borderRadius: 24,
+    marginTop: 12,
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    borderWidth: 0.5,
+    borderColor: '#E8F5E8',
   },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  
+  // Enhanced Card Styles
+  cardGradient: {
+    borderRadius: 24,
+    padding: 24,
+    minHeight: 400,
+  },
+  loadingIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#E8F5E8',
     justifyContent: 'center',
-    paddingVertical: 20,
-  },
-  loadingText: {
-    marginLeft: 12,
-    fontSize: 16,
-    color: '#666',
-  },
-  airQualityHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
   },
-  airQualityLeft: {
-    flex: 1,
+  
+  // Enhanced AQI Circle Styles
+  aqiCircleContainer: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  airQualityCity: {
+  aqiGradientCircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  aqiValue: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#fff',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  aqiLabel: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.95,
+    marginTop: 2,
+    fontWeight: '600',
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
+  },
+  mainLoadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  mainLoadingText: {
+    marginLeft: 12,
     fontSize: 18,
+    color: '#666',
+    fontWeight: '500',
+  },
+  mainAirQualityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+  },
+  mainAirQualityLeft: {
+    flex: 1,
+    paddingRight: 16,
+  },
+  mainAirQualityCity: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginBottom: 6,
+  },
+  mainAirQualityStatus: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  airQualityTimestamp: {
+    fontSize: 12,
+    color: '#999',
+    fontStyle: 'italic',
+  },
+  mainAqiCircle: {
+    width: 85,
+    height: 85,
+    borderRadius: 42.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  mainAqiValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  mainAqiLabel: {
+    fontSize: 14,
+    color: '#fff',
+    opacity: 0.9,
+    marginTop: 2,
+  },
+  pollutantsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  pollutantDetailItem: {
+    width: '48%',
+    backgroundColor: '#F8FFF8',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E8F5E8',
+  },
+  pollutantIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+    elevation: 1,
+  },
+  pollutantDetailLabel: {
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#2E7D32',
     marginBottom: 4,
   },
-  airQualityDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 18,
-  },
-  aqiCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 2,
-  },
-  aqiValue: {
-    fontSize: 24,
+  pollutantDetailValue: {
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#fff',
-  },
-  aqiLabel: {
-    fontSize: 12,
-    color: '#fff',
-    opacity: 0.9,
-  },
-  pollutantRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
-  },
-  pollutantItem: {
-    alignItems: 'center',
-    backgroundColor: '#F8FFF8',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    minWidth: 60,
-  },
-  pollutantLabel: {
-    fontSize: 12,
-    color: '#666',
+    color: '#333',
     marginBottom: 2,
   },
-  pollutantValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2E7D32',
-  },
-  airQualityFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-    paddingTop: 12,
-  },
-  airQualityFooterText: {
-    marginLeft: 8,
-    fontSize: 14,
-    color: '#666',
-  },
-  errorContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  errorText: {
-    marginTop: 12,
-    marginBottom: 16,
-    fontSize: 16,
+  pollutantDetailDesc: {
+    fontSize: 12,
     color: '#666',
     textAlign: 'center',
   },
+  healthRecommendations: {
+    backgroundColor: '#F0F8F0',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3CB371',
+  },
+  recommendationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  recommendationTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginLeft: 8,
+  },
+  recommendationText: {
+    fontSize: 14,
+    color: '#444',
+    lineHeight: 20,
+  },
+  actionButtonContainer: {
+    alignItems: 'center',
+  },
+  detailsActionButton: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#3CB371',
+    elevation: 2,
+  },
+  detailsActionText: {
+    color: '#3CB371',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 6,
+  },
+  mainErrorContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  mainErrorText: {
+    marginTop: 12,
+    marginBottom: 8,
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  errorSubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
   retryButton: {
     backgroundColor: '#3CB371',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 2,
   },
   retryText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+    marginLeft: 6,
+  },
+  noCampaignsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+  },
+  noCampaignsText: {
+    color: '#999',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 8,
   },
 }); 

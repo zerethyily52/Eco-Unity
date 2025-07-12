@@ -162,18 +162,12 @@ class EnvironmentalDataService {
     forestCoverage: number;
   }> {
     try {
-      // В реальном приложении это были бы данные из API
-      // Пока используем статические данные с небольшими вариациями
-      const baseAQI = 85 + Math.floor(Math.random() * 10);
-      const cities = 8469 + Math.floor(Math.random() * 100);
-      const co2 = 418 + Math.random() * 2; // ppm
-      const forest = 31.0 - Math.random() * 0.5; // процент
-      
+      // Используем фиксированные значения без случайных вариаций
       return {
-        globalAirQuality: baseAQI,
-        citiesMonitored: cities,
-        co2Levels: parseFloat(co2.toFixed(1)),
-        forestCoverage: parseFloat(forest.toFixed(1)),
+        globalAirQuality: 85,
+        citiesMonitored: 8469,
+        co2Levels: 418.5,
+        forestCoverage: 31.0,
       };
     } catch (error) {
       console.error('Error fetching global environmental stats:', error);

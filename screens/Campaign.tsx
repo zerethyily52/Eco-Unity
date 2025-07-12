@@ -1,71 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCampaignContext } from '../App';
+import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
 
 const { width: screenWidth } = Dimensions.get('window');
-
-const campaigns = [
-  {
-    title: 'Tree Planting Program',
-    description: 'Join us every weekend to plant trees and make our city greener. Every tree counts!',
-    image: { uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80' },
-    details: 'Participate in our tree planting events. Tools and saplings are provided. Suitable for all ages.',
-    steps: [
-      'Register for the event',
-      'Arrive at the park',
-      'Plant your tree',
-      'Share your experience on social media'
-    ],
-    benefits: [
-      'Greener city',
-      'Cleaner air',
-      'Community bonding'
-    ]
-  },
-  {
-    title: 'Clean River Initiative',
-    description: 'Help clean local rivers and lakes. Together we restore nature and protect wildlife.',
-    image: { uri: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' },
-    details: 'Join our river clean-up teams. Gloves and bags are provided. Let’s make our rivers beautiful again!',
-    steps: [
-      'Sign up for a clean-up day',
-      'Meet at the riverbank',
-      'Collect and sort trash',
-      'Celebrate with the team'
-    ],
-    benefits: [
-      'Healthier rivers',
-      'Safer wildlife',
-      'Cleaner environment'
-    ]
-  },
-  {
-    title: 'Plastic-Free Challenge',
-    description: 'Say no to single-use plastics for a week! Share your experience and inspire others.',
-    image: { uri: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80' },
-    details: 'Challenge yourself to avoid single-use plastics. Get tips and support from our community.',
-    steps: [
-      'Refuse plastic bags and bottles',
-      'Use reusable containers',
-      'Share your progress daily',
-      'Nominate a friend'
-    ],
-    benefits: [
-      'Less plastic waste',
-      'Healthier lifestyle',
-      'Inspiring others'
-    ]
-  },
-];
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#F6FFF6' },
   container: { flex: 1, backgroundColor: '#F6FFF6' },
   scrollContent: { paddingBottom: 80 },
-  mainCampaignTouchable: { marginBottom: 24 },
+  mainCampaignTouchable: { marginBottom: 16, position: 'relative' },
   img: {
     width: screenWidth,
     height: 240,
@@ -73,18 +22,75 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#E0F2E9',
   },
+  imgJoined: {
+    borderWidth: 3,
+    borderColor: '#3CB371',
+  },
+  mainJoinedBadgeBottom: {
+    backgroundColor: '#2E7D32',
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+  mainJoinedBadgeText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 6,
+  },
   contentBlock: {
     alignItems: 'center',
-    marginTop: 18,
+    marginTop: 12,
     paddingHorizontal: 16,
   },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#3CB371', marginBottom: 8, textAlign: 'center' },
-  desc: { fontSize: 15, color: '#444', textAlign: 'center', marginBottom: 18 },
-  progressWrap: { width: '90%', alignItems: 'center', marginBottom: 18 },
+  challengeContainer: {
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#3CB371', marginBottom: 6, textAlign: 'center' },
+  desc: { fontSize: 15, color: '#444', textAlign: 'center', marginBottom: 12 },
+  challengeExplanationBlock: {
+    backgroundColor: '#E8F5E8',
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 12,
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#3CB371',
+  },
+  challengeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  challengeTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3CB371',
+    marginLeft: 8,
+  },
+  challengeDescription: {
+    fontSize: 14,
+    color: '#555',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  progressWrap: { width: '90%', alignItems: 'center', marginBottom: 8 },
   progressBarBg: { width: '100%', height: 18, backgroundColor: '#E0F2E9', borderRadius: 10, overflow: 'hidden', marginBottom: 6 },
   progressBarFill: { height: 18, backgroundColor: '#3CB371', borderRadius: 10 },
   progressText: { fontSize: 13, color: '#3CB371', fontWeight: 'bold' },
-  doneBtn: { backgroundColor: '#3CB371', borderRadius: 22, paddingVertical: 14, paddingHorizontal: 60, alignItems: 'center', marginTop: 10, marginBottom: 24, elevation: 2 },
+  doneBtn: { backgroundColor: '#3CB371', borderRadius: 22, paddingVertical: 24, paddingHorizontal: 40, alignItems: 'center', marginTop: 6, marginBottom: 8, elevation: 2, borderWidth: 2, borderColor: '#2E7D32', alignSelf: 'stretch', minWidth: 280, minHeight: 68 },
   doneBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   thankYouBlock: { 
     backgroundColor: '#E8F5E8', 
@@ -92,8 +98,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16, 
     paddingHorizontal: 40, 
     alignItems: 'center', 
-    marginTop: 10, 
-    marginBottom: 24,
+    marginTop: 6, 
+    marginBottom: 8,
     borderWidth: 2,
     borderColor: '#3CB371'
   },
@@ -110,16 +116,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: 'italic'
   },
-  sectionTitle: { fontSize: 17, fontWeight: 'bold', color: '#222', marginLeft: 8, marginBottom: 8, alignSelf: 'flex-start' },
-  otherCampaignsRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    marginLeft: 8,
-    marginRight: 8,
-    marginBottom: 16,
-    flexWrap: 'wrap',
-  },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#3CB371', marginBottom: 8, alignSelf: 'center', textAlign: 'center' },
   otherCard: {
     width: 220,
     backgroundColor: '#fff',
@@ -130,6 +127,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 2,
     minHeight: 220,
+    borderWidth: 1.5,
+    borderColor: '#B8E6B8',
   },
   otherCardJoined: {
     width: 220,
@@ -141,8 +140,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 3,
     minHeight: 220,
-    borderWidth: 2,
-    borderColor: '#3CB371',
+    borderWidth: 2.5,
+    borderColor: '#2E7D32',
     position: 'relative',
   },
   joinedBadge: {
@@ -194,18 +193,131 @@ const styles = StyleSheet.create({
   doneBtnTextDisabled: { 
     color: '#999999' 
   },
+  
+  // Enhanced Loading Styles
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+  },
+  loadingCard: {
+    borderRadius: 24,
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E8F5E8',
+  },
+  loadingIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#E8F5E8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    elevation: 4,
+    shadowColor: '#4CAF50',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  loadingTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2E7D32',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  loadingSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 22,
+  },
+  loadingDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#4CAF50',
+  },
 });
 
 export default function Campaign({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState('campaign');
   const [progress, setProgress] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [campaigns, setCampaigns] = useState<CampaignType[]>([]);
+  const [loading, setLoading] = useState(true);
   const target = 10;
   const { isJoined } = useCampaignContext();
 
-  // Загрузка прогресса при монтировании компонента
+  // Animation values for loading
+  const spinValue = useState(new Animated.Value(0))[0];
+  const pulseValue = useState(new Animated.Value(1))[0];
+  const fadeValue = useState(new Animated.Value(0))[0];
+
+  useEffect(() => {
+    // Start animations when loading
+    if (loading) {
+      // Spin animation
+      Animated.loop(
+        Animated.timing(spinValue, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        })
+      ).start();
+
+      // Pulse animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseValue, {
+            toValue: 1.2,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseValue, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+
+      // Fade in animation
+      Animated.timing(fadeValue, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading]);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  // Загрузка кампаний при монтировании компонента
   useEffect(() => {
     loadProgress();
+    loadCampaigns();
   }, []);
 
   // Сохранение прогресса в AsyncStorage
@@ -229,13 +341,27 @@ export default function Campaign({ navigation }: { navigation: any }) {
     }
   };
 
+  // Загрузка кампаний из сервиса
+  const loadCampaigns = async () => {
+    try {
+      setLoading(true);
+      const campaignData = await CampaignService.getCampaigns();
+      setCampaigns(campaignData);
+    } catch (error) {
+      console.error('Error loading campaigns:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       setActiveTab('campaign');
     }, [])
   );
 
-  const campaign = campaigns[0];
+  const campaign = campaigns.length > 0 ? campaigns[0] : null;
+  const isCampaignJoined = campaign ? isJoined(campaign.title) : false;
 
   const handleDone = () => {
     if (isButtonDisabled) return; // Защита от случайного нажатия
@@ -258,89 +384,142 @@ export default function Campaign({ navigation }: { navigation: any }) {
     }, 1000);
   };
 
-
-
   return (
     <View style={styles.safeArea}>
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                    {/* Главная кампания */}
-                    <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate('CampaignDetail', { campaign })}
-            style={styles.mainCampaignTouchable}
-          >
-            <Image source={campaign.image} style={styles.img} resizeMode="cover" />
-            <View style={styles.contentBlock}>
-              <Text style={styles.title}>{campaign.title}</Text>
-              <Text style={styles.desc}>{campaign.description}</Text>
-              <View style={styles.progressWrap}>
-                <View style={styles.progressBarBg}>
-                  <View style={[styles.progressBarFill, { width: `${(progress / target) * 100}%` }]} />
+          {loading ? (
+            <Animated.View style={[styles.loadingContainer, { opacity: fadeValue }]}>
+              <LinearGradient
+                colors={['#ffffff', '#f8fff8', '#ffffff']}
+                style={styles.loadingCard}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Animated.View style={[styles.loadingIconContainer, { transform: [{ scale: pulseValue }] }]}>
+                  <Animated.View style={{ transform: [{ rotate: spin }] }}>
+                    <MaterialIcons name="eco" size={48} color="#4CAF50" />
+                  </Animated.View>
+                </Animated.View>
+                
+                <Text style={styles.loadingTitle}>Loading Campaigns</Text>
+                <Text style={styles.loadingSubtitle}>Discovering eco-friendly initiatives...</Text>
+                
+                <View style={styles.loadingDots}>
+                  <Animated.View style={[styles.dot, { opacity: pulseValue }]} />
+                  <Animated.View style={[styles.dot, { opacity: pulseValue }]} />
+                  <Animated.View style={[styles.dot, { opacity: pulseValue }]} />
                 </View>
-                <Text style={styles.progressText}>{progress}/{target} Done</Text>
+              </LinearGradient>
+            </Animated.View>
+          ) : campaign ? (
+            <>
+              {/* Главная кампания - только кликабельная часть */}
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={() => navigation.navigate('CampaignDetail', { campaign })}
+                style={styles.mainCampaignTouchable}
+              >
+                <Image 
+                  source={campaign.image} 
+                  style={styles.img} 
+                  resizeMode="cover" 
+                />
+                
+                {/* Badge для присоединившихся - под картинкой */}
+                {isCampaignJoined && (
+                  <View style={styles.mainJoinedBadgeBottom}>
+                    <MaterialIcons name="verified" size={18} color="#fff" />
+                    <Text style={styles.mainJoinedBadgeText}>PARTICIPATING</Text>
+                  </View>
+                )}
+                
+                <View style={styles.contentBlock}>
+                  <Text style={styles.title}>{campaign.title}</Text>
+                  <Text style={styles.desc}>{campaign.description}</Text>
+                </View>
+              </TouchableOpacity>
+              
+              {/* Блок объяснения челленджа - НЕ кликабельный */}
+              <View style={styles.challengeContainer}>
+                <View style={styles.challengeExplanationBlock}>
+                  <View style={styles.challengeHeader}>
+                    <MaterialIcons name="park" size={24} color="#3CB371" />
+                    <Text style={styles.challengeTitle}>Tree Planting Challenge</Text>
+                  </View>
+                  <Text style={styles.challengeDescription}>
+                    Help improve air quality by planting trees! Each time you plant a tree or take action to improve air quality, tap the "Done" button below. Together we can make our cities greener! 🌱
+                  </Text>
+                </View>
+                
+                <View style={styles.progressWrap}>
+                  <View style={styles.progressBarBg}>
+                    <View style={[styles.progressBarFill, { width: `${(progress / target) * 100}%` }]} />
+                  </View>
+                  <Text style={styles.progressText}>{progress}/{target} Done</Text>
+                </View>
+                {progress >= target ? (
+                  <TouchableOpacity 
+                    style={styles.thankYouBlock} 
+                    onLongPress={resetProgress}
+                    onPress={() => {}} 
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.thankYouText}>🎉 Thank you for participating!</Text>
+                    <Text style={styles.resetHintText}>(Long press to reset)</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity 
+                    style={[styles.doneBtn, isButtonDisabled && styles.doneBtnDisabled]} 
+                    onPress={handleDone}
+                    disabled={isButtonDisabled}
+                    activeOpacity={isButtonDisabled ? 1 : 0.8}
+                  >
+                    <Text style={[styles.doneBtnText, isButtonDisabled && styles.doneBtnTextDisabled]}>
+                      {isButtonDisabled ? 'Wait...' : 'Done'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
-              {progress >= target ? (
-                <TouchableOpacity 
-                  style={styles.thankYouBlock} 
-                  onLongPress={resetProgress}
-                  onPress={() => {}} 
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.thankYouText}>🎉 Thank you for participating!</Text>
-                  <Text style={styles.resetHintText}>(Long press to reset)</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity 
-                  style={[styles.doneBtn, isButtonDisabled && styles.doneBtnDisabled]} 
-                  onPress={handleDone}
-                  disabled={isButtonDisabled}
-                  activeOpacity={isButtonDisabled ? 1 : 0.8}
-                >
-                  <Text style={[styles.doneBtnText, isButtonDisabled && styles.doneBtnTextDisabled]}>
-                    {isButtonDisabled ? 'Wait...' : 'Done'}
-                  </Text>
-                </TouchableOpacity>
-              )}
+              
+              {/* Другие кампании */}
+              <Text style={styles.sectionTitle}>Other Campaigns</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.otherScroll}
+                contentContainerStyle={{ paddingLeft: 8, paddingRight: 16, marginBottom: 24 }}
+              >
+                {campaigns.slice(1).map((c, i) => {
+                  const joined = isJoined(c.title);
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      style={joined ? styles.otherCardJoined : styles.otherCard}
+                      activeOpacity={0.85}
+                      onPress={() => navigation.navigate('CampaignDetail', { campaign: c })}
+                    >
+                      {joined && (
+                        <View style={styles.joinedBadge}>
+                          <Text style={styles.joinedBadgeText}>JOINED</Text>
+                        </View>
+                      )}
+                      <Image source={c.image} style={styles.otherImg} resizeMode="cover" />
+                      <Text style={styles.otherTitle}>{c.title}</Text>
+                      <Text style={styles.otherDesc}>
+                        {c.description}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+              <View style={{ height: 48 }} />
+            </>
+          ) : (
+            <View style={styles.contentBlock}>
+              <Text style={styles.desc}>No campaigns available</Text>
             </View>
-          </TouchableOpacity>
-          {/* Другие кампании */}
-          <Text style={styles.sectionTitle}>Other Campaigns</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.otherScroll}
-            contentContainerStyle={{ paddingLeft: 8, paddingRight: 16, marginBottom: 24 }}
-          >
-            {campaigns.slice(1).map((c, i) => {
-              const joined = isJoined(c.title);
-              return (
-                <TouchableOpacity
-                  key={i}
-                  style={joined ? styles.otherCardJoined : styles.otherCard}
-                  activeOpacity={0.85}
-                  onPress={() => navigation.navigate('CampaignDetail', { campaign: c })}
-                >
-                  {joined && (
-                    <View style={styles.joinedBadge}>
-                      <Text style={styles.joinedBadgeText}>JOINED</Text>
-                    </View>
-                  )}
-                  <Image source={c.image} style={styles.otherImg} resizeMode="cover" />
-                  <Text style={styles.otherTitle}>{c.title}</Text>
-                  <Text style={styles.otherDesc}>
-                    {joined ? 'Participating' : c.description}
-                  </Text>
-                  {joined && (
-                    <View style={styles.joinedOverlay}>
-                      <Text style={styles.joinedCheckmark}>✓</Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-          <View style={{ height: 48 }} />
+          )}
         </ScrollView>
         <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} navigation={navigation} />
       </View>
