@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCampaignContext } from '../App';
+import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   progressBarBg: { width: '100%', height: 18, backgroundColor: '#E0F2E9', borderRadius: 10, overflow: 'hidden', marginBottom: 6 },
   progressBarFill: { height: 18, backgroundColor: '#3CB371', borderRadius: 10 },
   progressText: { fontSize: 13, color: '#3CB371', fontWeight: 'bold' },
-  doneBtn: { backgroundColor: '#3CB371', borderRadius: 22, paddingVertical: 14, paddingHorizontal: 60, alignItems: 'center', marginTop: 10, marginBottom: 24, elevation: 2 },
+  doneBtn: { backgroundColor: '#3CB371', borderRadius: 22, paddingVertical: 28, paddingHorizontal: 40, alignItems: 'center', marginTop: 10, marginBottom: 24, elevation: 2, width: '100%', minHeight: 80 },
   doneBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
   thankYouBlock: { 
     backgroundColor: '#E8F5E8', 
@@ -95,7 +96,9 @@ const styles = StyleSheet.create({
     marginTop: 10, 
     marginBottom: 24,
     borderWidth: 2,
-    borderColor: '#3CB371'
+    borderColor: '#3CB371',
+    width: '100%',
+    minHeight: 80
   },
   thankYouText: { 
     color: '#3CB371', 
@@ -194,18 +197,75 @@ const styles = StyleSheet.create({
   doneBtnTextDisabled: { 
     color: '#999999' 
   },
+  // Skeleton стили для загрузки
+  skeletonMainImage: {
+    backgroundColor: '#E0E0E0',
+  },
+  skeletonMainTitle: {
+    height: 28,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 6,
+    marginBottom: 12,
+    width: '80%',
+  },
+  skeletonMainDescription: {
+    height: 18,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 8,
+    width: '100%',
+  },
+  skeletonProgressBar: {
+    backgroundColor: '#E0E0E0',
+  },
+  skeletonProgressText: {
+    height: 16,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    width: 80,
+    marginTop: 8,
+  },
+  skeletonDoneButton: {
+    height: 48,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 12,
+    marginTop: 16,
+    width: '100%',
+  },
+  skeletonOtherImage: {
+    backgroundColor: '#E0E0E0',
+  },
+  skeletonOtherTitle: {
+    height: 15,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 8,
+    width: '70%',
+    alignSelf: 'center',
+  },
+  skeletonOtherDescription: {
+    height: 12,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    width: '90%',
+    alignSelf: 'center',
+  },
 });
 
 export default function Campaign({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState('campaign');
   const [progress, setProgress] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(true);
+  const [mainCampaign, setMainCampaign] = useState<CampaignType | null>(null);
+  const [otherCampaigns, setOtherCampaigns] = useState<CampaignType[]>([]);
   const target = 10;
   const { isJoined } = useCampaignContext();
 
   // Загрузка прогресса при монтировании компонента
   useEffect(() => {
     loadProgress();
+    loadCampaigns();
   }, []);
 
   // Сохранение прогресса в AsyncStorage
@@ -229,13 +289,31 @@ export default function Campaign({ navigation }: { navigation: any }) {
     }
   };
 
+  // Загрузка кампаний
+  const loadCampaigns = async () => {
+    setIsLoadingCampaigns(true);
+    // Имитация загрузки
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
+    // Рерандомизируем статистики перед получением кампаний
+    CampaignService.rerandomizeStats();
+    
+    // Получаем главную кампанию по посадке деревьев (Tree Planting Program всегда первая)
+    const treePlantingCampaigns = CampaignService.getTreePlantingCampaigns();
+    const main = treePlantingCampaigns.find(c => c.title.includes('Tree Planting Program') || c.title.includes('Urban Forest Project')) || treePlantingCampaigns[0];
+    setMainCampaign(main);
+
+    // Получаем 4 другие кампании, исключая главную
+    const others = CampaignService.getCampaignsExcluding([main.id]).slice(0, 4);
+    setOtherCampaigns(others);
+    setIsLoadingCampaigns(false);
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       setActiveTab('campaign');
     }, [])
   );
-
-  const campaign = campaigns[0];
 
   const handleDone = () => {
     if (isButtonDisabled) return; // Защита от случайного нажатия
@@ -265,15 +343,31 @@ export default function Campaign({ navigation }: { navigation: any }) {
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     {/* Главная кампания */}
-                    <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate('CampaignDetail', { campaign })}
-            style={styles.mainCampaignTouchable}
-          >
-            <Image source={campaign.image} style={styles.img} resizeMode="cover" />
-            <View style={styles.contentBlock}>
-              <Text style={styles.title}>{campaign.title}</Text>
-              <Text style={styles.desc}>{campaign.description}</Text>
+                    {isLoadingCampaigns ? (
+                      // Skeleton для главной кампании
+                      <View style={styles.mainCampaignTouchable}>
+                        <View style={[styles.img, styles.skeletonMainImage]} />
+                        <View style={styles.contentBlock}>
+                          <View style={[styles.skeletonMainTitle]} />
+                          <View style={[styles.skeletonMainDescription]} />
+                          <View style={[styles.skeletonMainDescription, { width: '70%' }]} />
+                          <View style={styles.progressWrap}>
+                            <View style={[styles.progressBarBg, styles.skeletonProgressBar]} />
+                            <View style={[styles.skeletonProgressText]} />
+                          </View>
+                          <View style={[styles.skeletonDoneButton]} />
+                        </View>
+                      </View>
+                    ) : mainCampaign && (
+                      <TouchableOpacity
+                        activeOpacity={0.85}
+                        onPress={() => navigation.navigate('CampaignDetail', { campaign: mainCampaign })}
+                        style={styles.mainCampaignTouchable}
+                      >
+                        <Image source={mainCampaign.image} style={styles.img} resizeMode="cover" />
+                        <View style={styles.contentBlock}>
+                          <Text style={styles.title}>{mainCampaign.title}</Text>
+                          <Text style={styles.desc}>{mainCampaign.description}</Text>
               <View style={styles.progressWrap}>
                 <View style={styles.progressBarBg}>
                   <View style={[styles.progressBarFill, { width: `${(progress / target) * 100}%` }]} />
@@ -304,6 +398,7 @@ export default function Campaign({ navigation }: { navigation: any }) {
               )}
             </View>
           </TouchableOpacity>
+                      )}
           {/* Другие кампании */}
           <Text style={styles.sectionTitle}>Other Campaigns</Text>
           <ScrollView
@@ -312,7 +407,17 @@ export default function Campaign({ navigation }: { navigation: any }) {
             style={styles.otherScroll}
             contentContainerStyle={{ paddingLeft: 8, paddingRight: 16, marginBottom: 24 }}
           >
-            {campaigns.slice(1).map((c, i) => {
+            {isLoadingCampaigns ? (
+              // Skeleton для других кампаний
+              [1, 2, 3, 4].map((index) => (
+                <View key={`skeleton-other-${index}`} style={styles.otherCard}>
+                  <View style={[styles.otherImg, styles.skeletonOtherImage]} />
+                  <View style={[styles.skeletonOtherTitle]} />
+                  <View style={[styles.skeletonOtherDescription]} />
+                </View>
+              ))
+            ) : (
+              otherCampaigns.map((c, i) => {
               const joined = isJoined(c.title);
               return (
                 <TouchableOpacity
@@ -338,7 +443,8 @@ export default function Campaign({ navigation }: { navigation: any }) {
                   )}
                 </TouchableOpacity>
               );
-            })}
+            }))
+            }
           </ScrollView>
           <View style={{ height: 48 }} />
         </ScrollView>

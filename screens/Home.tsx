@@ -5,6 +5,7 @@ import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCampaignContext } from '../App';
 import EnvironmentalDataService, { AirQualityData } from '../services/EnvironmentalDataService';
+import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
 
 export default function Home({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState('home');
@@ -12,6 +13,8 @@ export default function Home({ navigation }: { navigation: any }) {
   const [selectedService, setSelectedService] = useState<any>(null);
   const [airQualityData, setAirQualityData] = useState<AirQualityData | null>(null);
   const [isLoadingAirQuality, setIsLoadingAirQuality] = useState(true);
+  const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(true);
+  const [homeCampaigns, setHomeCampaigns] = useState<CampaignType[]>([]);
   const { isJoined } = useCampaignContext();
 
   useFocusEffect(
@@ -20,10 +23,38 @@ export default function Home({ navigation }: { navigation: any }) {
     }, [])
   );
 
-  // Загрузка данных о качестве воздуха
+  // Загрузка данных о качестве воздуха и кампаний
   useEffect(() => {
     loadAirQualityData();
+    loadHomeCampaigns();
   }, []);
+
+  const loadHomeCampaigns = async () => {
+    setIsLoadingCampaigns(true);
+    // Имитация загрузки
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Рерандомизируем статистики перед получением кампаний
+    CampaignService.rerandomizeStats();
+    
+    // Получаем все кампании для проверки joined статуса
+    const allCampaigns = CampaignService.getAllCampaigns();
+    
+    // Получаем кампании к которым присоединился пользователь
+    const joinedCampaigns = allCampaigns.filter(campaign => isJoined(campaign.title));
+    
+    // Получаем кампании к которым НЕ присоединился пользователь
+    const notJoinedCampaigns = allCampaigns.filter(campaign => !isJoined(campaign.title));
+    
+    // Перемешиваем НЕ присоединенные кампании и берем 4
+    const shuffledNotJoined = [...notJoinedCampaigns].sort(() => 0.5 - Math.random());
+    const randomNotJoinedCampaigns = shuffledNotJoined.slice(0, 4);
+    
+    // Создаем финальный список: 4 случайные НЕ присоединенные + все присоединенные в конце
+    const campaigns = [...randomNotJoinedCampaigns, ...joinedCampaigns];
+    
+    setHomeCampaigns(campaigns);
+    setIsLoadingCampaigns(false);
+  };
 
   const loadAirQualityData = async () => {
     setIsLoadingAirQuality(true);
@@ -47,32 +78,7 @@ export default function Home({ navigation }: { navigation: any }) {
     setSelectedService(null);
   };
 
-  const homeCampaigns = [
-    {
-      title: 'Urban Forest Project',
-      description: 'Help us plant and care for trees in city parks and streets.',
-      image: { uri: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80' },
-      details: 'Join our urban forest project to make the city greener. We organize regular tree planting and care events. Everyone is welcome!',
-    },
-    {
-      title: 'Eco School Program',
-      description: 'Support eco-education and recycling in local schools.',
-      image: { uri: 'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80' },
-      details: 'Become a volunteer in our Eco School Program. Teach kids about recycling, energy saving, and nature protection.',
-    },
-    {
-      title: 'Clean Beach Action',
-      description: 'Join us to clean up beaches and protect marine life.',
-      image: { uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80' },
-      details: 'Participate in our monthly beach cleanups. Help us collect plastic and other waste to keep our coasts beautiful and safe for wildlife.',
-    },
-    {
-      title: 'Green Transport Week',
-      description: 'Promote cycling, walking, and public transport in your city.',
-      image: { uri: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80' },
-      details: 'Take part in Green Transport Week! Use a bike, walk, or take public transport. Share your experience and inspire others.',
-    },
-  ];
+
 
   const handleCampaignPress = (campaign: any) => {
     // Просто переходим к деталям кампании, не присоединяемся автоматически
@@ -182,56 +188,75 @@ export default function Home({ navigation }: { navigation: any }) {
             </TouchableOpacity>
           </View>
 
-          {/* Our Campaign */}
+          {/* Кампании */}
           <View style={styles.campaignBlock}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Our Campaign</Text>
-              <Text style={styles.sectionSubtitle}>Join our environmental initiatives</Text>
+                              <Text style={styles.sectionTitle}>Our Campaigns</Text>
+                              <Text style={styles.sectionSubtitle}>Discover new campaigns{'\n'}Your joined campaigns at the end</Text>
             </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
               style={styles.campaignScroll}
               contentContainerStyle={styles.campaignScrollContent}
             >
-              {homeCampaigns.map((c, i) => {
-                const joined = isJoined(c.title);
-                return (
-                  <TouchableOpacity
-                    key={i}
-                    style={[styles.campaignCard, joined && styles.campaignCardJoined]}
-                    onPress={() => handleCampaignPress(c)}
-                    activeOpacity={0.85}
-                  >
-                    <View style={styles.campaignImageContainer}>
-                      <Image source={c.image} style={styles.campaignImg} resizeMode="cover" />
-                      {joined && (
-                        <View style={styles.joinedBadge}>
-                          <MaterialIcons name="verified" size={24} color="#fff" />
-                          <Text style={styles.joinedBadgeText}>JOINED</Text>
-                        </View>
-                      )}
-                      <View style={styles.campaignOverlay}>
-                        <MaterialIcons name={joined ? "check" : "arrow-forward"} size={18} color="#fff" />
-                      </View>
-                    </View>
+              {isLoadingCampaigns ? (
+                // Skeleton для загрузки кампаний
+                [1, 2, 3, 4].map((index) => (
+                  <View key={`skeleton-${index}`} style={styles.campaignCard}>
+                    <View style={[styles.campaignImageContainer, styles.skeletonImage]} />
                     <View style={styles.campaignContent}>
-                      <Text style={[styles.campaignTitle, joined && styles.campaignTitleJoined]}>{c.title}</Text>
-                      <Text style={styles.campaignDesc}>{c.description}</Text>
+                      <View style={[styles.skeletonTitle]} />
+                      <View style={[styles.skeletonDescription]} />
+                      <View style={[styles.skeletonDescription, { width: '60%' }]} />
                       <View style={styles.campaignFooter}>
-                        <Text style={[styles.joinText, joined && styles.joinTextCompleted]}>
-                          {joined ? "Participating" : "Join Now"}
-                        </Text>
-                        <MaterialIcons 
-                          name={joined ? "verified" : "trending-up"} 
-                          size={16} 
-                          color={joined ? "#2E7D32" : "#3CB371"} 
-                        />
+                        <View style={[styles.skeletonButton]} />
+                        <View style={[styles.skeletonIcon]} />
                       </View>
                     </View>
-                  </TouchableOpacity>
-                );
-              })}
+                  </View>
+                ))
+              ) : (
+                homeCampaigns.map((campaign) => {
+                  const joined = isJoined(campaign.title);
+                  return (
+                <TouchableOpacity 
+                  key={campaign.id} 
+                  style={[styles.campaignCard, joined && styles.campaignCardJoined]}
+                  onPress={() => navigation.navigate('CampaignDetail', { campaign })}
+                >
+                  <View style={styles.campaignImageContainer}>
+                    <Image source={campaign.image} style={styles.campaignImg} resizeMode="cover" />
+                    <View style={styles.campaignOverlay}>
+                      <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+                    </View>
+                    {joined && (
+                      <View style={styles.joinedOverlay}>
+                        <MaterialIcons name="check-circle" size={24} color="#fff" />
+                      </View>
+                    )}
+                  </View>
+                  <View style={styles.campaignContent}>
+                    <Text style={[styles.campaignTitle, joined && styles.campaignTitleJoined]}>{campaign.title}</Text>
+                    <Text style={styles.campaignDesc}>
+                      {joined ? 'You are participating in this campaign!' : campaign.description}
+                    </Text>
+                    <View style={styles.campaignFooter}>
+                      <Text style={[styles.joinText, joined && styles.joinTextCompleted]}>
+                        {joined ? 'Joined' : 'Join Now'}
+                      </Text>
+                      <MaterialIcons 
+                        name={joined ? "verified" : "trending-up"} 
+                        size={16} 
+                        color={joined ? "#2E7D32" : "#3CB371"} 
+                      />
+                    </View>
+                  </View>
+                </TouchableOpacity>
+                                    );
+                })
+              )
+              }
             </ScrollView>
           </View>
           <View style={{ height: 48 }} />
@@ -412,7 +437,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   campaignCard: {
-    width: 260,
+    width: 350,
+    height: 320,
     backgroundColor: '#fff',
     borderRadius: 20,
     marginRight: 16,
@@ -431,7 +457,7 @@ const styles = StyleSheet.create({
   },
   campaignImageContainer: {
     width: '100%',
-    height: 140,
+    height: 160,
     position: 'relative',
   },
   campaignImg: {
@@ -466,24 +492,26 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   campaignContent: {
-    padding: 16,
+    padding: 18,
+    flex: 1,
+    justifyContent: 'space-between',
   },
-  campaignTitle: { fontSize: 15, fontWeight: 'bold', color: '#3CB371', marginBottom: 6, textAlign: 'left' },
+  campaignTitle: { fontSize: 16, fontWeight: 'bold', color: '#3CB371', marginBottom: 6, textAlign: 'left' },
   campaignTitleJoined: {
     color: '#2E7D32',
   },
-  campaignDesc: { fontSize: 12, color: '#666', textAlign: 'left', lineHeight: 16 },
+  campaignDesc: { fontSize: 14, color: '#666', textAlign: 'left', lineHeight: 20 },
   campaignFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 12,
-    paddingTop: 8,
+    marginTop: 16,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
   },
   joinText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#3CB371',
     fontWeight: 'bold',
   },
@@ -612,6 +640,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginTop: 8,
+    height: 180,
+    justifyContent: 'space-between',
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -619,6 +649,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   loadingContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -674,11 +705,15 @@ const styles = StyleSheet.create({
   },
   pollutantItem: {
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#F8FFF8',
     borderRadius: 8,
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    minWidth: 60,
+    paddingHorizontal: 8,
+    minWidth: 70,
+    height: 60,
+    flex: 1,
+    marginHorizontal: 4,
   },
   pollutantLabel: {
     fontSize: 12,
@@ -704,7 +739,9 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   errorContainer: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 20,
   },
   errorText: {
@@ -724,5 +761,35 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  // Skeleton стили для загрузки кампаний
+  skeletonImage: {
+    backgroundColor: '#E0E0E0',
+  },
+  skeletonTitle: {
+    height: 16,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 8,
+    width: '80%',
+  },
+  skeletonDescription: {
+    height: 14,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 6,
+    width: '100%',
+  },
+  skeletonButton: {
+    height: 14,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    width: 60,
+  },
+  skeletonIcon: {
+    height: 16,
+    width: 16,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 8,
   },
 }); 

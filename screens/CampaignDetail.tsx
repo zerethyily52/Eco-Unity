@@ -1,131 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useCampaignContext } from '../App';
+import { Campaign as CampaignType } from '../services/CampaignService';
+import CampaignService from '../services/CampaignService';
 
 const { width } = Dimensions.get('window');
 
 export default function CampaignDetail({ route, navigation }: { route: any, navigation: any }) {
-  const { campaign } = route.params;
+  const { campaign: initialCampaign }: { campaign: CampaignType } = route.params;
   const { joinCampaign, leaveCampaign, isJoined } = useCampaignContext();
+  const [isLoading, setIsLoading] = useState(true);
+  const [campaign, setCampaign] = useState<CampaignType>(initialCampaign);
 
-  // Добавляем дополнительные данные для каждой кампании
-  const getCampaignData = (title: string) => {
-    switch (title) {
-      case 'Urban Forest Project':
-        return {
-          steps: [
-            'Register on our website or mobile app',
-            'Choose your preferred planting location',
-            'Attend a brief orientation session',
-            'Join weekly planting events',
-            'Help with ongoing tree maintenance'
-          ],
-          benefits: [
-            'Improve air quality in your neighborhood',
-            'Create green spaces for community',
-            'Learn about sustainable gardening',
-            'Meet like-minded eco enthusiasts',
-            'Earn community service hours'
-          ],
-          stats: {
-            participants: 1250,
-            treesPlanted: 3400,
-            areas: 15
-          },
-          duration: '6 months',
-          difficulty: 'Beginner',
-          location: 'City Parks & Streets'
-        };
-      case 'Eco School Program':
-        return {
-          steps: [
-            'Apply as a volunteer educator',
-            'Complete online training modules',
-            'Get assigned to local schools',
-            'Prepare interactive lessons',
-            'Conduct weekly educational sessions'
-          ],
-          benefits: [
-            'Educate the next generation',
-            'Develop teaching skills',
-            'Make lasting impact on kids',
-            'Build professional network',
-            'Gain volunteer experience'
-          ],
-          stats: {
-            participants: 890,
-            schoolsReached: 45,
-            studentsImpacted: 12000
-          },
-          duration: '1 school year',
-          difficulty: 'Intermediate',
-          location: 'Local Schools'
-        };
-      case 'Clean Beach Action':
-        return {
-          steps: [
-            'Check monthly cleanup schedule',
-            'Bring reusable water bottle',
-            'Meet at designated beach area',
-            'Collect trash and recyclables',
-            'Sort materials for proper disposal'
-          ],
-          benefits: [
-            'Protect marine wildlife',
-            'Keep beaches beautiful',
-            'Reduce ocean pollution',
-            'Enjoy outdoor exercise',
-            'Connect with nature lovers'
-          ],
-          stats: {
-            participants: 650,
-            trashCollected: 2800,
-            beachesClean: 8
-          },
-          duration: 'Monthly events',
-          difficulty: 'Beginner',
-          location: 'Coastal Areas'
-        };
-      case 'Green Transport Week':
-        return {
-          steps: [
-            'Download our tracking app',
-            'Log your daily transport choices',
-            'Share photos of eco-friendly trips',
-            'Join group cycling events',
-            'Encourage friends to participate'
-          ],
-          benefits: [
-            'Reduce carbon footprint',
-            'Improve personal fitness',
-            'Save money on gas',
-            'Discover new routes',
-            'Win weekly prizes'
-          ],
-          stats: {
-            participants: 2100,
-            milesWalked: 15600,
-            co2Saved: 4200
-          },
-          duration: '1 week',
-          difficulty: 'Easy',
-          location: 'Citywide'
-        };
-      default:
-        return {
-          steps: ['Join the campaign', 'Follow guidelines', 'Make a difference'],
-          benefits: ['Help the environment', 'Meet new people', 'Feel good'],
-          stats: { participants: 100, impact: 500, areas: 5 },
-          duration: '1 month',
-          difficulty: 'Beginner',
-          location: 'Various'
-        };
-    }
-  };
-
-  const data = getCampaignData(campaign.title);
+  // Получаем актуальный статус присоединения
   const hasJoined = isJoined(campaign.title);
+
+  useEffect(() => {
+    // Имитация загрузки деталей кампании
+    const loadDetails = async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Рерандомизируем статистики для свежих данных
+      CampaignService.rerandomizeStats();
+      
+      // Получаем обновленную кампанию из сервиса
+      const updatedCampaign = CampaignService.getCampaignById(initialCampaign.id);
+      if (updatedCampaign) {
+        setCampaign(updatedCampaign);
+      }
+      
+      setIsLoading(false);
+    };
+    loadDetails();
+  }, [initialCampaign.id]);
 
   const handleJoinCampaign = () => {
     joinCampaign(campaign.title);
@@ -149,12 +56,37 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+        {isLoading ? (
+          // Loading skeleton для деталей кампании
+          <View style={styles.loadingContainer}>
+            <View style={styles.skeletonHeroImage} />
+            <View style={styles.skeletonSection}>
+              <View style={styles.skeletonTitle} />
+              <View style={styles.skeletonDescription} />
+              <View style={[styles.skeletonDescription, { width: '80%' }]} />
+              <View style={[styles.skeletonDescription, { width: '60%' }]} />
+              
+              <View style={styles.skeletonSectionTitle} />
+              <View style={styles.skeletonListItem} />
+              <View style={styles.skeletonListItem} />
+              <View style={styles.skeletonListItem} />
+              
+              <View style={styles.skeletonSectionTitle} />
+              <View style={styles.skeletonListItem} />
+              <View style={styles.skeletonListItem} />
+              
+              <View style={styles.skeletonButton} />
+            </View>
+            <MaterialIcons name="hourglass-empty" size={32} color="#3CB371" style={styles.loadingIcon} />
+          </View>
+        ) : (
+          <>
         {/* Hero Image Section */}
         <View style={styles.heroSection}>
           <Image source={campaign.image} style={styles.heroImg} />
           <View style={styles.heroOverlay}>
             <View style={styles.difficultyBadge}>
-              <Text style={styles.difficultyText}>{data.difficulty}</Text>
+              <Text style={styles.difficultyText}>{campaign.difficulty}</Text>
             </View>
             {hasJoined && (
               <View style={styles.joinedStatusBadge}>
@@ -177,12 +109,12 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
             <View style={styles.infoCard}>
               <MaterialIcons name="schedule" size={20} color="#3CB371" />
               <Text style={styles.infoLabel}>Duration</Text>
-              <Text style={styles.infoValue}>{data.duration}</Text>
+              <Text style={styles.infoValue}>{campaign.duration}</Text>
             </View>
             <View style={styles.infoCard}>
               <MaterialIcons name="location-on" size={20} color="#3CB371" />
               <Text style={styles.infoLabel}>Location</Text>
-              <Text style={styles.infoValue}>{data.location}</Text>
+              <Text style={styles.infoValue}>{campaign.location}</Text>
             </View>
           </View>
 
@@ -191,24 +123,24 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
             <Text style={styles.sectionTitle}>Impact Statistics</Text>
             <View style={styles.statsGrid}>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{data.stats.treesPlanted || data.stats.trashCollected || data.stats.milesWalked || data.stats.studentsImpacted || 1000}</Text>
+                <Text style={styles.statNumber}>{campaign.stats.treesPlanted || campaign.stats.trashCollected || campaign.stats.milesWalked || campaign.stats.studentsImpacted || 1000}</Text>
                 <Text style={styles.statLabel} numberOfLines={2}>
-                  {data.stats.treesPlanted ? 'Trees\nPlanted' : 
-                   data.stats.trashCollected ? 'Lbs\nCollected' : 
-                   data.stats.milesWalked ? 'Miles\nWalked' : 
-                   data.stats.studentsImpacted ? 'Students' : 'Total Impact'}
+                  {campaign.stats.treesPlanted ? 'Trees\nPlanted' : 
+                   campaign.stats.trashCollected ? 'Lbs\nCollected' : 
+                   campaign.stats.milesWalked ? 'Miles\nWalked' : 
+                   campaign.stats.studentsImpacted ? 'Students' : 'Total Impact'}
                 </Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{data.stats.participants}</Text>
+                <Text style={styles.statNumber}>{campaign.stats.participants}</Text>
                 <Text style={styles.statLabel} numberOfLines={2}>Participants</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statNumber}>{data.stats.areas || data.stats.schoolsReached || data.stats.beachesClean || data.stats.co2Saved}</Text>
+                <Text style={styles.statNumber}>{campaign.stats.areas || campaign.stats.schoolsReached || campaign.stats.beachesClean || campaign.stats.co2Saved}</Text>
                 <Text style={styles.statLabel} numberOfLines={2}>
-                  {data.stats.areas ? 'Areas' : 
-                   data.stats.schoolsReached ? 'Schools' : 
-                   data.stats.beachesClean ? 'Beaches' : 'CO2 Saved\n(lbs)'}
+                  {campaign.stats.areas ? 'Areas' : 
+                   campaign.stats.schoolsReached ? 'Schools' : 
+                   campaign.stats.beachesClean ? 'Beaches' : 'CO2 Saved\n(lbs)'}
                 </Text>
               </View>
             </View>
@@ -217,7 +149,7 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
           {/* How to Participate */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>How to Participate</Text>
-            {data.steps.map((step: string, idx: number) => (
+            {campaign.steps.map((step: string, idx: number) => (
               <View key={idx} style={styles.stepItem}>
                 <View style={styles.stepNumber}>
                   <Text style={styles.stepNumberText}>{idx + 1}</Text>
@@ -230,7 +162,7 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
           {/* Benefits */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Benefits & Impact</Text>
-            {data.benefits.map((benefit: string, idx: number) => (
+            {campaign.benefits.map((benefit: string, idx: number) => (
               <View key={idx} style={styles.benefitItem}>
                 <MaterialIcons name="check-circle" size={20} color="#3CB371" />
                 <Text style={styles.benefitText}>{benefit}</Text>
@@ -265,6 +197,8 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
 
           <View style={{ height: 40 }} />
         </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -532,5 +466,60 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
+  },
+  // Skeleton стили для загрузки
+  loadingContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  skeletonHeroImage: {
+    width: width,
+    height: 300,
+    backgroundColor: '#E0E0E0',
+    marginBottom: 20,
+  },
+  skeletonSection: {
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  skeletonTitle: {
+    height: 32,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 6,
+    marginBottom: 16,
+    width: '80%',
+  },
+  skeletonDescription: {
+    height: 18,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 10,
+    width: '100%',
+  },
+  skeletonSectionTitle: {
+    height: 24,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 5,
+    marginTop: 20,
+    marginBottom: 12,
+    width: '60%',
+  },
+  skeletonListItem: {
+    height: 16,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 4,
+    marginBottom: 8,
+    width: '90%',
+  },
+  skeletonButton: {
+    height: 50,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 12,
+    marginTop: 30,
+    width: '100%',
+  },
+  loadingIcon: {
+    marginTop: 20,
+    opacity: 0.7,
   },
 });
