@@ -1,72 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCampaignContext } from '../App';
 import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
+import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
 
 const { width: screenWidth } = Dimensions.get('window');
-
-const campaigns = [
-  {
-    title: 'Tree Planting Program',
-    description: 'Join us every weekend to plant trees and make our city greener. Every tree counts!',
-    image: { uri: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80' },
-    details: 'Participate in our tree planting events. Tools and saplings are provided. Suitable for all ages.',
-    steps: [
-      'Register for the event',
-      'Arrive at the park',
-      'Plant your tree',
-      'Share your experience on social media'
-    ],
-    benefits: [
-      'Greener city',
-      'Cleaner air',
-      'Community bonding'
-    ]
-  },
-  {
-    title: 'Clean River Initiative',
-    description: 'Help clean local rivers and lakes. Together we restore nature and protect wildlife.',
-    image: { uri: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' },
-    details: 'Join our river clean-up teams. Gloves and bags are provided. Let’s make our rivers beautiful again!',
-    steps: [
-      'Sign up for a clean-up day',
-      'Meet at the riverbank',
-      'Collect and sort trash',
-      'Celebrate with the team'
-    ],
-    benefits: [
-      'Healthier rivers',
-      'Safer wildlife',
-      'Cleaner environment'
-    ]
-  },
-  {
-    title: 'Plastic-Free Challenge',
-    description: 'Say no to single-use plastics for a week! Share your experience and inspire others.',
-    image: { uri: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=800&q=80' },
-    details: 'Challenge yourself to avoid single-use plastics. Get tips and support from our community.',
-    steps: [
-      'Refuse plastic bags and bottles',
-      'Use reusable containers',
-      'Share your progress daily',
-      'Nominate a friend'
-    ],
-    benefits: [
-      'Less plastic waste',
-      'Healthier lifestyle',
-      'Inspiring others'
-    ]
-  },
-];
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#F6FFF6' },
   container: { flex: 1, backgroundColor: '#F6FFF6' },
   scrollContent: { paddingBottom: 80 },
-  mainCampaignTouchable: { marginBottom: 24 },
+  mainCampaignTouchable: { marginBottom: 16, position: 'relative' },
   img: {
     width: screenWidth,
     height: 240,
@@ -74,14 +23,71 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#E0F2E9',
   },
+  imgJoined: {
+    borderWidth: 3,
+    borderColor: '#3CB371',
+  },
+  mainJoinedBadgeBottom: {
+    backgroundColor: '#2E7D32',
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 6,
+  },
+  mainJoinedBadgeText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 6,
+  },
   contentBlock: {
     alignItems: 'center',
-    marginTop: 18,
+    marginTop: 12,
     paddingHorizontal: 16,
   },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#3CB371', marginBottom: 8, textAlign: 'center' },
-  desc: { fontSize: 15, color: '#444', textAlign: 'center', marginBottom: 18 },
-  progressWrap: { width: '90%', alignItems: 'center', marginBottom: 18 },
+  challengeContainer: {
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#3CB371', marginBottom: 6, textAlign: 'center' },
+  desc: { fontSize: 15, color: '#444', textAlign: 'center', marginBottom: 12 },
+  challengeExplanationBlock: {
+    backgroundColor: '#E8F5E8',
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 12,
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#3CB371',
+  },
+  challengeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  challengeTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#3CB371',
+    marginLeft: 8,
+  },
+  challengeDescription: {
+    fontSize: 14,
+    color: '#555',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  progressWrap: { width: '90%', alignItems: 'center', marginBottom: 8 },
   progressBarBg: { width: '100%', height: 18, backgroundColor: '#E0F2E9', borderRadius: 10, overflow: 'hidden', marginBottom: 6 },
   progressBarFill: { height: 18, backgroundColor: '#3CB371', borderRadius: 10 },
   progressText: { fontSize: 13, color: '#3CB371', fontWeight: 'bold' },
@@ -93,8 +99,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16, 
     paddingHorizontal: 40, 
     alignItems: 'center', 
-    marginTop: 10, 
-    marginBottom: 24,
+    marginTop: 6, 
+    marginBottom: 8,
     borderWidth: 2,
     borderColor: '#3CB371',
     width: '100%',
@@ -113,16 +119,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontStyle: 'italic'
   },
-  sectionTitle: { fontSize: 17, fontWeight: 'bold', color: '#222', marginLeft: 8, marginBottom: 8, alignSelf: 'flex-start' },
-  otherCampaignsRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    marginLeft: 8,
-    marginRight: 8,
-    marginBottom: 16,
-    flexWrap: 'wrap',
-  },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#3CB371', marginBottom: 8, alignSelf: 'center', textAlign: 'center' },
   otherCard: {
     width: 220,
     backgroundColor: '#fff',
@@ -133,6 +130,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 2,
     minHeight: 220,
+    borderWidth: 1.5,
+    borderColor: '#B8E6B8',
   },
   otherCardJoined: {
     width: 220,
@@ -144,8 +143,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 3,
     minHeight: 220,
-    borderWidth: 2,
-    borderColor: '#3CB371',
+    borderWidth: 2.5,
+    borderColor: '#2E7D32',
     position: 'relative',
   },
   joinedBadge: {
@@ -262,9 +261,57 @@ export default function Campaign({ navigation }: { navigation: any }) {
   const target = 10;
   const { isJoined } = useCampaignContext();
 
-  // Загрузка прогресса при монтировании компонента
+  // Animation values for loading
+  const spinValue = useState(new Animated.Value(0))[0];
+  const pulseValue = useState(new Animated.Value(1))[0];
+  const fadeValue = useState(new Animated.Value(0))[0];
+
+  useEffect(() => {
+    // Start animations when loading
+    if (loading) {
+      // Spin animation
+      Animated.loop(
+        Animated.timing(spinValue, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        })
+      ).start();
+
+      // Pulse animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseValue, {
+            toValue: 1.2,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseValue, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+
+      // Fade in animation
+      Animated.timing(fadeValue, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [loading]);
+
+  const spin = spinValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  // Загрузка кампаний при монтировании компонента
   useEffect(() => {
     loadProgress();
+    loadCampaigns();
     loadCampaigns();
   }, []);
 
@@ -335,8 +382,6 @@ export default function Campaign({ navigation }: { navigation: any }) {
       setIsButtonDisabled(false);
     }, 1000);
   };
-
-
 
   return (
     <View style={styles.safeArea}>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useCampaignContext } from '../App';
@@ -99,10 +100,14 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
 
         {/* Main Content */}
         <View style={styles.content}>
-          {/* Title and Description */}
-          <Text style={styles.title}>{campaign.title}</Text>
-          <Text style={styles.desc}>{campaign.description}</Text>
-          {campaign.details && <Text style={styles.details}>{campaign.details}</Text>}
+          {loading ? (
+            <Text style={styles.desc}>Loading campaign details...</Text>
+          ) : (
+            <>
+              {/* Title and Description */}
+              <Text style={styles.title}>{campaign.title}</Text>
+              <Text style={styles.desc}>{campaign.description}</Text>
+              {campaign.details && <Text style={styles.details}>{campaign.details}</Text>}
 
           {/* Quick Info Cards */}
           <View style={styles.infoCards}>
@@ -170,30 +175,30 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
             ))}
           </View>
 
-          {/* Action Buttons */}
-          {!hasJoined ? (
-            <TouchableOpacity 
-              style={styles.joinButton} 
-              onPress={handleJoinCampaign}
-            >
-              <MaterialIcons name="volunteer-activism" size={24} color="#fff" />
-              <Text style={styles.joinButtonText}>Join This Campaign</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.buttonContainer}>
-              <View style={styles.participatingContainer}>
-                <MaterialIcons name="verified" size={24} color="#2E7D32" />
-                <Text style={styles.participatingText}>You're participating in this campaign!</Text>
-              </View>
-              <TouchableOpacity 
-                style={styles.leaveButton} 
-                onPress={handleLeaveCampaign}
-              >
-                <MaterialIcons name="exit-to-app" size={20} color="#fff" />
-                <Text style={styles.leaveButtonText}>Leave Campaign</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+              {/* Action Buttons */}
+              {!hasJoined ? (
+                <TouchableOpacity 
+                  style={styles.joinButton} 
+                  onPress={handleJoinCampaign}
+                >
+                  <MaterialIcons name="volunteer-activism" size={24} color="#fff" />
+                  <Text style={styles.joinButtonText}>Join This Campaign</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.buttonContainer}>
+                  <View style={styles.participatingContainer}>
+                    <MaterialIcons name="verified" size={24} color="#2E7D32" />
+                    <Text style={styles.participatingText}>You're participating in this campaign!</Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.leaveButton} 
+                    onPress={handleLeaveCampaign}
+                  >
+                    <MaterialIcons name="exit-to-app" size={20} color="#fff" />
+                    <Text style={styles.leaveButtonText}>Leave Campaign</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
 
           <View style={{ height: 40 }} />
         </View>
