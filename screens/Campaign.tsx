@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCampaignContext } from '../App';
+import { useCampaignContext } from '../contexts/CampaignContext';
 import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
 
 const { width: screenWidth } = Dimensions.get('window');

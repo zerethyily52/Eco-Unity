@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
-import { useCampaignContext } from '../App';
+import { useCampaignContext } from '../contexts/CampaignContext';
 import { Campaign as CampaignType } from '../services/CampaignService';
 import CampaignService from '../services/CampaignService';
 

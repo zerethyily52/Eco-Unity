@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, 
 import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCampaignContext } from '../App';
+import { useCampaignContext } from '../contexts/CampaignContext';
 import EnvironmentalDataService, { AirQualityData } from '../services/EnvironmentalDataService';
 import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
 
