@@ -79,8 +79,6 @@ export default function Home({ navigation }: { navigation: any }) {
     setSelectedService(null);
   };
 
-
-
   const handleCampaignPress = (campaign: any) => {
     // Просто переходим к деталям кампании, не присоединяемся автоматически
     navigation.navigate('CampaignDetail', { campaign });
@@ -478,6 +476,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 160,
     position: 'relative',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    overflow: 'hidden',
   },
   campaignImg: {
     width: '100%',
@@ -508,7 +509,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 20,
   },
   campaignContent: {
     padding: 18,
