@@ -9,9 +9,9 @@ import {
   Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import BottomNavBar from '../components/BottomNavBar';
+import StorageService, { STORAGE_KEYS } from '../services/StorageService';
 
 type ChallengeType = {
   id: number;
@@ -21,8 +21,6 @@ type ChallengeType = {
   progress: number;
   total: number;
 };
-
-const CHALLENGES_KEY = '@challenges_progress';
 
 const challengesData: ChallengeType[] = [
   {
@@ -75,7 +73,7 @@ export default function Challenge({ navigation }: { navigation: any }) {
 
   const clearStorage = async () => {
     try {
-      await AsyncStorage.removeItem(CHALLENGES_KEY);
+      await StorageService.removeItem(STORAGE_KEYS.CHALLENGES_PROGRESS);
       setChallengesList(challengesData.map(ch => ({ ...ch, progress: 0 })));
       console.log('Challenges storage cleared');
     } catch (error) {
@@ -85,7 +83,7 @@ export default function Challenge({ navigation }: { navigation: any }) {
 
   const saveChallengesProgress = async (challenges: ChallengeType[]) => {
     try {
-      await AsyncStorage.setItem(CHALLENGES_KEY, JSON.stringify(challenges));
+      await StorageService.setItem(STORAGE_KEYS.CHALLENGES_PROGRESS, challenges);
     } catch (error) {
       console.error('Error saving challenges:', error);
     }
@@ -93,11 +91,10 @@ export default function Challenge({ navigation }: { navigation: any }) {
 
   const loadChallengesProgress = async () => {
     try {
-      const storedChallenges = await AsyncStorage.getItem(CHALLENGES_KEY);
-      if (storedChallenges) {
-        const parsedChallenges = JSON.parse(storedChallenges);
+      const storedChallenges = await StorageService.getItem<ChallengeType[]>(STORAGE_KEYS.CHALLENGES_PROGRESS, []);
+      if (storedChallenges.length > 0) {
         const mergedChallenges = challengesData.map(challenge => {
-          const storedChallenge = parsedChallenges.find((stored: ChallengeType) => stored.id === challenge.id);
+          const storedChallenge = storedChallenges.find((stored: ChallengeType) => stored.id === challenge.id);
           return storedChallenge ? { ...challenge, progress: storedChallenge.progress } : challenge;
         });
         setChallengesList(mergedChallenges);

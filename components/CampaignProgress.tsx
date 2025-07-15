@@ -1,21 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import StorageService from '../services/StorageService';
 
 interface CampaignProgressProps {
-  progress: number;
-  target: number;
-  isButtonDisabled: boolean;
-  onDone: () => void;
-  onReset: () => void;
+  campaignId: string;
+  campaignTitle: string;
 }
 
-const CampaignProgress: React.FC<CampaignProgressProps> = ({
-  progress,
-  target,
-  isButtonDisabled,
-  onDone,
-  onReset
-}) => {
+export default function CampaignProgress({ campaignId, campaignTitle }: CampaignProgressProps) {
+  const [progress, setProgress] = useState(0);
+  const [target] = useState(10); // Фиксированная цель
+  const [isResetting, setIsResetting] = useState(false);
+
+  // Загружаем прогресс при монтировании
+  useEffect(() => {
+    loadProgress();
+  }, [campaignId]);
+
+  const loadProgress = async () => {
+    try {
+      const campaignStats = await StorageService.getCampaignStats();
+      const stats = campaignStats[campaignId];
+      const savedProgress = stats?.userContribution?.treesPlanted || 0;
+      setProgress(savedProgress);
+    } catch (error) {
+      console.error('Error loading progress:', error);
+    }
+  };
+
+  const saveProgress = async (newProgress: number) => {
+    try {
+      await StorageService.updateCampaignStat(campaignId, {
+        userContribution: {
+          treesPlanted: newProgress
+        }
+      });
+    } catch (error) {
+      console.error('Error saving progress:', error);
+    }
+  };
+
+  const handlePlantTree = async () => {
+    if (progress < target) {
+      const newProgress = progress + 1;
+      setProgress(newProgress);
+      await saveProgress(newProgress);
+    }
+  };
+
+  const handleReset = async () => {
+    setProgress(0);
+    await saveProgress(0);
+    
+    setIsResetting(true);
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 2000); // 2 секунды cooldown после сброса
+  };
+
   return (
     <View style={styles.progressCard}>
       <Text style={styles.cardTitle}>Your Progress</Text>
@@ -27,32 +69,34 @@ const CampaignProgress: React.FC<CampaignProgressProps> = ({
         <Text style={styles.progressText}>{progress}/{target} Trees Planted</Text>
       </View>
       <View style={styles.buttonContainer}>
-        {progress >= target ? (
-          <TouchableOpacity 
-            style={styles.actionButton} 
-            onLongPress={onReset}
-            onPress={() => {}} 
-            activeOpacity={0.8}
+        {progress >= target || isResetting ? (
+          <TouchableOpacity
+            style={[styles.actionButton, isResetting && styles.buttonDisabled]} 
+            {...(!isResetting && { onLongPress: handleReset })}
+            activeOpacity={isResetting ? 1 : 0.8}
+            disabled={isResetting}
           >
-            <Text style={styles.thankYouText}>🎉 Thank you!</Text>
-            <Text style={styles.resetHintText}>(Long press to reset)</Text>
+            {isResetting ? (
+              <Text style={styles.buttonTextDisabled}>Wait...</Text>
+            ) : (
+              <>
+                <Text style={styles.thankYouText}>🎉 Thank you!</Text>
+                <Text style={styles.resetHintText}>(Long press to reset)</Text>
+              </>
+            )}
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.plantButton, isButtonDisabled && styles.buttonDisabled]} 
-            onPress={onDone}
-            disabled={isButtonDisabled}
-            activeOpacity={isButtonDisabled ? 1 : 0.8}
+          <TouchableOpacity
+            style={[styles.actionButton, styles.plantButton]} 
+            onPress={handlePlantTree}
           >
-            <Text style={[styles.buttonText, isButtonDisabled && styles.buttonTextDisabled]}>
-              {isButtonDisabled ? 'Wait...' : 'Plant Tree'}
-            </Text>
+            <Text style={styles.buttonText}>Plant Tree</Text>
           </TouchableOpacity>
         )}
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   progressCard: {
@@ -84,7 +128,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   progressWrap: { 
-    alignItems: 'center', 
+    alignItems: 'center',
     marginBottom: 16 
   },
   progressBarBg: { 
@@ -128,14 +172,14 @@ const styles = StyleSheet.create({
     borderColor: '#F4D03F',
   },
   buttonText: { 
-    color: '#2F4F4F', 
+    color: '#2F4F4F',
     fontSize: 14, 
     fontWeight: 'bold' 
   },
   thankYouText: { 
     color: '#F4D03F', 
     fontSize: 13, 
-    fontWeight: 'bold', 
+    fontWeight: 'bold',
     textAlign: 'center',
     lineHeight: 16,
   },
@@ -155,6 +199,4 @@ const styles = StyleSheet.create({
   buttonTextDisabled: { 
     color: '#B8B8B8' 
   },
-});
-
-export default CampaignProgress; 
+}); 

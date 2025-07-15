@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import StorageService from '../services/StorageService';
 
 // Глобальный контекст для кампаний
 interface CampaignContextType {
   joinedCampaigns: string[];
-  joinCampaign: (campaignTitle: string) => void;
-  leaveCampaign: (campaignTitle: string) => void;
+  joinCampaign: (campaignTitle: string, campaignId?: string) => void;
+  leaveCampaign: (campaignTitle: string, campaignId?: string) => void;
   isJoined: (campaignTitle: string) => boolean;
+  isLoading: boolean;
 }
 
 const CampaignContext = createContext<CampaignContextType | undefined>(undefined);
@@ -24,26 +26,84 @@ interface CampaignProviderProps {
 
 export const CampaignProvider: React.FC<CampaignProviderProps> = ({ children }) => {
   const [joinedCampaigns, setJoinedCampaigns] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const joinCampaign = (campaignTitle: string) => {
-    setJoinedCampaigns(prev => {
-      if (!prev.includes(campaignTitle)) {
-        return [...prev, campaignTitle];
-      }
-      return prev;
-    });
+  // Загрузка данных при инициализации
+  useEffect(() => {
+    loadJoinedCampaigns();
+  }, []);
+
+  const loadJoinedCampaigns = async () => {
+    try {
+      setIsLoading(true);
+      const savedCampaigns = await StorageService.getJoinedCampaigns();
+      setJoinedCampaigns(savedCampaigns);
+    } catch (error) {
+      console.error('Error loading joined campaigns:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const leaveCampaign = (campaignTitle: string) => {
-    setJoinedCampaigns(prev => prev.filter(title => title !== campaignTitle));
+  const joinCampaign = async (campaignTitle: string, campaignId?: string) => {
+    const updatedCampaigns = joinedCampaigns.includes(campaignTitle) 
+      ? joinedCampaigns 
+      : [...joinedCampaigns, campaignTitle];
+    
+    setJoinedCampaigns(updatedCampaigns);
+    
+    try {
+      await StorageService.saveJoinedCampaigns(updatedCampaigns);
+      
+      // Сохраняем статистику присоединения к кампании
+      if (campaignId) {
+        await StorageService.updateCampaignStat(campaignId, {
+          dateJoined: new Date().toISOString(),
+          userContribution: {},
+          isCompleted: false
+        });
+      }
+    } catch (error) {
+      console.error('Error saving joined campaign:', error);
+      // Откатываем изменения при ошибке
+      setJoinedCampaigns(joinedCampaigns);
+    }
+  };
+
+  const leaveCampaign = async (campaignTitle: string, campaignId?: string) => {
+    const updatedCampaigns = joinedCampaigns.filter(title => title !== campaignTitle);
+    setJoinedCampaigns(updatedCampaigns);
+    
+    try {
+      await StorageService.saveJoinedCampaigns(updatedCampaigns);
+      
+      // Удаляем статистику кампании при выходе
+      if (campaignId) {
+        const currentStats = await StorageService.getCampaignStats();
+        delete currentStats[campaignId];
+        await StorageService.saveCampaignStats(currentStats);
+      }
+    } catch (error) {
+      console.error('Error saving after leaving campaign:', error);
+      // Откатываем изменения при ошибке
+      setJoinedCampaigns(joinedCampaigns);
+    }
   };
 
   const isJoined = (campaignTitle: string) => {
     return joinedCampaigns.includes(campaignTitle);
   };
 
+
+
   return (
-    <CampaignContext.Provider value={{ joinedCampaigns, joinCampaign, leaveCampaign, isJoined }}>
+    <CampaignContext.Provider value={{ 
+      joinedCampaigns, 
+      joinCampaign, 
+      leaveCampaign, 
+      isJoined, 
+      isLoading 
+    }}>
       {children}
     </CampaignContext.Provider>
   );

@@ -6,6 +6,7 @@ import { useCampaignContext } from '../contexts/CampaignContext';
 import { Campaign as CampaignType } from '../services/CampaignService';
 import CampaignService from '../services/CampaignService';
 
+
 const { width } = Dimensions.get('window');
 
 export default function CampaignDetail({ route, navigation }: { route: any, navigation: any }) {
@@ -14,33 +15,37 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
   const [isLoading, setIsLoading] = useState(true);
   const [campaign, setCampaign] = useState<CampaignType>(initialCampaign);
 
+
   // Получаем актуальный статус присоединения
   const hasJoined = isJoined(campaign.title);
 
   useEffect(() => {
-    // Имитация загрузки деталей кампании
-    const loadDetails = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // Рерандомизируем статистики для свежих данных
-      CampaignService.rerandomizeStats();
-      
-      // Получаем обновленную кампанию из сервиса
-      const updatedCampaign = CampaignService.getCampaignById(initialCampaign.id);
-      if (updatedCampaign) {
-        setCampaign(updatedCampaign);
-      }
-      
-      setIsLoading(false);
-    };
-    loadDetails();
+    loadCampaignDetails();
   }, [initialCampaign.id]);
 
+  const loadCampaignDetails = async () => {
+    // Имитация загрузки деталей кампании
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Рерандомизируем статистики для свежих данных
+    CampaignService.rerandomizeStats();
+    
+    // Получаем обновленную кампанию из сервиса
+    const updatedCampaign = CampaignService.getCampaignById(initialCampaign.id);
+    if (updatedCampaign) {
+      setCampaign(updatedCampaign);
+    }
+    
+    setIsLoading(false);
+  };
+
+
+
   const handleJoinCampaign = () => {
-    joinCampaign(campaign.title);
+    joinCampaign(campaign.title, campaign.id);
   };
 
   const handleLeaveCampaign = () => {
-    leaveCampaign(campaign.title);
+    leaveCampaign(campaign.title, campaign.id);
   };
 
   return (
@@ -142,6 +147,8 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
               </View>
             </View>
           </View>
+
+
 
           {/* How to Participate */}
           <View style={styles.section}>

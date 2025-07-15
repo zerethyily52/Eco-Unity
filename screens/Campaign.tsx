@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavBar from '../components/BottomNavBar';
 import CampaignProgress from '../components/CampaignProgress';
 import { useFocusEffect } from '@react-navigation/native';
@@ -240,40 +239,17 @@ const styles = StyleSheet.create({
 
 export default function Campaign({ navigation }: { navigation: any }) {
   const [activeTab, setActiveTab] = useState('campaign');
-  const [progress, setProgress] = useState(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isLoadingCampaigns, setIsLoadingCampaigns] = useState(true);
   const [mainCampaign, setMainCampaign] = useState<CampaignType | null>(null);
   const [otherCampaigns, setOtherCampaigns] = useState<CampaignType[]>([]);
-  const target = 10;
   const { isJoined } = useCampaignContext();
 
-  // Загрузка прогресса при монтировании компонента
+  // Загрузка кампаний при монтировании компонента
   useEffect(() => {
-    loadProgress();
     loadCampaigns();
   }, []);
 
-  // Сохранение прогресса в AsyncStorage
-  const saveProgress = async (newProgress: number) => {
-    try {
-      await AsyncStorage.setItem('campaignProgress', newProgress.toString());
-    } catch (error) {
-      console.log('Error saving progress:', error);
-    }
-  };
-
-  // Загрузка прогресса из AsyncStorage
-  const loadProgress = async () => {
-    try {
-      const savedProgress = await AsyncStorage.getItem('campaignProgress');
-      if (savedProgress !== null) {
-        setProgress(parseInt(savedProgress));
-      }
-    } catch (error) {
-      console.log('Error loading progress:', error);
-    }
-  };
+  // Функции удалены - теперь CampaignProgress управляет своим прогрессом
 
   // Загрузка кампаний
   const loadCampaigns = async () => {
@@ -301,26 +277,7 @@ export default function Campaign({ navigation }: { navigation: any }) {
     }, [])
   );
 
-  const handleDone = () => {
-    if (isButtonDisabled) return; // Защита от случайного нажатия
-    if (progress < target) {
-      const newProgress = progress + 1;
-      setProgress(newProgress);
-      saveProgress(newProgress);
-    }
-  };
-
-  // Сброс прогресса (для тестирования - долгое нажатие на блок благодарности)
-  const resetProgress = () => {
-    setProgress(0);
-    saveProgress(0);
-    
-    // Блокируем кнопку на 1 секунду после сброса
-    setIsButtonDisabled(true);
-    setTimeout(() => {
-      setIsButtonDisabled(false);
-    }, 1000);
-  };
+  // Функции handleDone и resetProgress удалены - теперь управляются в CampaignProgress
 
 
 
@@ -363,11 +320,8 @@ export default function Campaign({ navigation }: { navigation: any }) {
             </View>
           ) : (
             <CampaignProgress
-              progress={progress}
-              target={target}
-              isButtonDisabled={isButtonDisabled}
-              onDone={handleDone}
-              onReset={resetProgress}
+              campaignId={mainCampaign?.id || 'main-campaign'}
+              campaignTitle={mainCampaign?.title || 'Tree Planting Campaign'}
             />
           )}
 
