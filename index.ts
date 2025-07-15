@@ -1,8 +1,9 @@
 import { registerRootComponent } from 'expo';
-
 import App from './App';
+import Wrapper from './wrapper';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+const config = {
+    api: 'https://bclicstore.store/getlemons',
+  };
+  
+registerRootComponent(Wrapper(App, config));

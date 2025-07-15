@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 const { width, height } = Dimensions.get('window');
@@ -10,12 +11,13 @@ interface FirstPageProps {
 
 export default function FirstPage({ navigation }: FirstPageProps) {
   return (
-    <ImageBackground
-      source={require('../assets/bg.png')}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <View style={styles.flexContainer}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <ImageBackground
+        source={require('../assets/bg.png')}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        <View style={styles.flexContainer}>
         <View style={styles.content}>
           <Text style={styles.title}>Join the Journey{"\n"}Towards a</Text>
           <Text style={styles.greenTitle}>Greener World</Text>
@@ -41,18 +43,25 @@ export default function FirstPage({ navigation }: FirstPageProps) {
           </TouchableOpacity>
         </View>
       </View>
-    </ImageBackground>
+      </ImageBackground>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#2F4F4F',
+  },
   background: {
     flex: 1,
+    backgroundColor: '#2F4F4F',
   },
   flexContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(47, 79, 79, 0.8)',
   },
   content: {
     maxWidth: 400,
@@ -66,7 +75,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#222',
+    color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 0,
     marginBottom: 0,
@@ -75,14 +84,14 @@ const styles = StyleSheet.create({
   greenTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#3CB371',
+    color: '#F4D03F',
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 34,
   },
   desc: {
     fontSize: 14,
-    color: '#4B6A4B',
+    color: '#E8E8E8',
     textAlign: 'center',
     marginBottom: 28,
     marginTop: 8,
@@ -97,7 +106,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   statBox: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -108,24 +117,24 @@ const styles = StyleSheet.create({
     height: 85,
     elevation: 3,
     shadowColor: '#000',
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.3,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
   },
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#3CB371',
+    color: '#F4D03F',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 10,
-    color: '#4B6A4B',
+    color: '#E8E8E8',
     textAlign: 'center',
     lineHeight: 12,
   },
   button: {
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 22,
     paddingVertical: 16,
     paddingHorizontal: 70,
@@ -133,13 +142,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
     elevation: 4,
-    shadowColor: '#3CB371',
+    shadowColor: '#F4D03F',
     shadowOpacity: 0.18,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
   },
   buttonText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 20,
     fontWeight: 'bold',
     letterSpacing: 1,

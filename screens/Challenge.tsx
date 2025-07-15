@@ -8,6 +8,7 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import BottomNavBar from '../components/BottomNavBar';
@@ -156,154 +157,19 @@ export default function Challenge({ navigation }: { navigation: any }) {
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.headerContainer}
-        onLongPress={clearStorage}
-        activeOpacity={0.9}
-      >
-        {/* Простой венок цветов вокруг текста */}
-        
-        {/* Левая сторона от текста */}
-        <View style={[styles.flowerTopLeft, { top: 90, left: 20, width: 16, height: 16 }]}>
-          <View style={[styles.flowerPetals, { width: 16, height: 16 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#FF69B4', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#FF69B4', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#FF69B4', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#FF69B4', width: 6, height: 6 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FFD700', width: 6, height: 6, top: 5, left: 5 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { top: 75, left: 40, width: 14, height: 14 }]}>
-          <View style={[styles.flowerPetals, { width: 14, height: 14 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#87CEEB', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#87CEEB', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#87CEEB', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#87CEEB', width: 5, height: 5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FFA500', width: 5, height: 5, top: 4.5, left: 4.5 }]} />
-        </View>
-
-        {/* Верхняя часть над текстом */}
-        <View style={[styles.flowerTopLeft, { top: 65, left: 80, width: 18, height: 18 }]}>
-          <View style={[styles.flowerPetals, { width: 18, height: 18 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#98FB98', width: 7, height: 7 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#98FB98', width: 7, height: 7 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#98FB98', width: 7, height: 7 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#98FB98', width: 7, height: 7 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FF6347', width: 7, height: 7, top: 5.5, left: 5.5 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { top: 70, left: 120, width: 16, height: 16 }]}>
-          <View style={[styles.flowerPetals, { width: 16, height: 16 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#DDA0DD', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#DDA0DD', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#DDA0DD', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#DDA0DD', width: 6, height: 6 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#32CD32', width: 6, height: 6, top: 5, left: 5 }]} />
-        </View>
-
-        {/* Правая сторона от текста */}
-        <View style={[styles.flowerTopLeft, { top: 75, right: 40, left: 'auto', width: 14, height: 14 }]}>
-          <View style={[styles.flowerPetals, { width: 14, height: 14 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#F0E68C', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#F0E68C', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#F0E68C', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#F0E68C', width: 5, height: 5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FF1493', width: 5, height: 5, top: 4.5, left: 4.5 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { top: 90, right: 20, left: 'auto', width: 16, height: 16 }]}>
-          <View style={[styles.flowerPetals, { width: 16, height: 16 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#FFA07A', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#FFA07A', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#FFA07A', width: 6, height: 6 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#FFA07A', width: 6, height: 6 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#20B2AA', width: 6, height: 6, top: 5, left: 5 }]} />
-        </View>
-
-        {/* Нижняя часть под текстом */}
-        <View style={[styles.flowerTopLeft, { top: 110, left: 50, width: 15, height: 15 }]}>
-          <View style={[styles.flowerPetals, { width: 15, height: 15 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#FF7F50', width: 5.5, height: 5.5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#FF7F50', width: 5.5, height: 5.5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#FF7F50', width: 5.5, height: 5.5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#FF7F50', width: 5.5, height: 5.5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#00CED1', width: 5.5, height: 5.5, top: 4.75, left: 4.75 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { top: 105, left: 90, width: 17, height: 17 }]}>
-          <View style={[styles.flowerPetals, { width: 17, height: 17 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#DA70D6', width: 6.5, height: 6.5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#DA70D6', width: 6.5, height: 6.5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#DA70D6', width: 6.5, height: 6.5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#DA70D6', width: 6.5, height: 6.5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FFFF00', width: 6.5, height: 6.5, top: 5.25, left: 5.25 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { top: 110, right: 50, left: 'auto', width: 15, height: 15 }]}>
-          <View style={[styles.flowerPetals, { width: 15, height: 15 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#40E0D0', width: 5.5, height: 5.5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#40E0D0', width: 5.5, height: 5.5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#40E0D0', width: 5.5, height: 5.5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#40E0D0', width: 5.5, height: 5.5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FF4500', width: 5.5, height: 5.5, top: 4.75, left: 4.75 }]} />
-        </View>
-
-        {/* Несколько декоративных цветов рядом с текстом */}
-        <View style={[styles.flowerTopLeft, { top: 50, left: 25, width: 12, height: 12 }]}>
-          <View style={[styles.flowerPetals, { width: 12, height: 12 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#FF69B4', width: 4, height: 4 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#FF69B4', width: 4, height: 4 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#FF69B4', width: 4, height: 4 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#FF69B4', width: 4, height: 4 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FFD700', width: 4, height: 4, top: 4, left: 4 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { top: 45, right: 25, left: 'auto', width: 12, height: 12 }]}>
-          <View style={[styles.flowerPetals, { width: 12, height: 12 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#87CEEB', width: 4, height: 4 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#87CEEB', width: 4, height: 4 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#87CEEB', width: 4, height: 4 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#87CEEB', width: 4, height: 4 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FFA500', width: 4, height: 4, top: 4, left: 4 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { bottom: 25, left: 40, top: 'auto', width: 14, height: 14 }]}>
-          <View style={[styles.flowerPetals, { width: 14, height: 14 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#98FB98', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#98FB98', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#98FB98', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#98FB98', width: 5, height: 5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#FF6347', width: 5, height: 5, top: 4.5, left: 4.5 }]} />
-        </View>
-
-        <View style={[styles.flowerTopLeft, { bottom: 30, right: 40, left: 'auto', top: 'auto', width: 14, height: 14 }]}>
-          <View style={[styles.flowerPetals, { width: 14, height: 14 }]}>
-            <View style={[styles.petal, styles.petal1, { backgroundColor: '#DDA0DD', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal2, { backgroundColor: '#DDA0DD', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal3, { backgroundColor: '#DDA0DD', width: 5, height: 5 }]} />
-            <View style={[styles.petal, styles.petal4, { backgroundColor: '#DDA0DD', width: 5, height: 5 }]} />
-          </View>
-          <View style={[styles.flowerCenter, { backgroundColor: '#32CD32', width: 5, height: 5, top: 4.5, left: 4.5 }]} />
-        </View>
-
-        <Text style={styles.headerEmoji}>🌍</Text>
-        <Text style={styles.header}>Green Challenges</Text>
-        <Text style={styles.headerSubtitle}>Make a difference, one step at a time</Text>
-        <Text style={styles.resetHint}>Long press to refresh data</Text>
-      </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={styles.container}>
+      <View style={styles.staticHeader}>
+        <TouchableOpacity 
+          onLongPress={clearStorage}
+          activeOpacity={0.9}
+          style={styles.headerContent}
+        >
+          <Text style={styles.header}>Green Challenges</Text>
+          <Text style={styles.headerSubtitle}>Make a difference, one step at a time</Text>
+          <Text style={styles.resetHint}>Long press to refresh data</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {challengesList.map(ch => {
           const isCompleted = ch.progress >= ch.total;
@@ -375,136 +241,92 @@ export default function Challenge({ navigation }: { navigation: any }) {
           </View>
         </View>
       </Modal>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0F8F0' },
-  headerContainer: {
-    backgroundColor: '#3CB371',
-    paddingTop: 60,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    alignItems: 'center',
-    elevation: 5,
-    position: 'relative',
-    overflow: 'hidden',
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#2F4F4F',
   },
-  headerEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
+  container: { flex: 1, backgroundColor: '#2F4F4F' },
+  staticHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#2F4F4F',
+    zIndex: 1000,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  headerContent: {
+    backgroundColor: '#2F4F4F',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    alignItems: 'center',
   },
   header: { 
     fontSize: 24, 
     fontWeight: 'bold', 
-    color: '#FFFFFF', 
+    color: '#F4D03F', 
     marginBottom: 5,
     textAlign: 'center',
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#E8F5E8',
+    color: '#E8E8E8',
     textAlign: 'center',
     fontStyle: 'italic',
   },
   resetHint: {
     fontSize: 10,
-    color: '#B8E6B8',
+    color: '#B8B8B8',
     textAlign: 'center',
     marginTop: 4,
     opacity: 0.7,
   },
-  // Кастомные цветы
-  flowerTopLeft: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    width: 20,
-    height: 20,
-  },
-  flowerTopRight: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    width: 20,
-    height: 20,
-  },
-  flowerPetals: {
-    position: 'relative',
-    width: 20,
-    height: 20,
-  },
-  petal: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    backgroundColor: '#FFE4E1',
-    borderRadius: 4,
-    opacity: 0.8,
-  },
-  petal1: {
-    top: 0,
-    left: 6,
-    transform: [{ rotate: '0deg' }],
-  },
-  petal2: {
-    top: 6,
-    right: 0,
-    transform: [{ rotate: '90deg' }],
-  },
-  petal3: {
-    bottom: 0,
-    left: 6,
-    transform: [{ rotate: '180deg' }],
-  },
-  petal4: {
-    top: 6,
-    left: 0,
-    transform: [{ rotate: '270deg' }],
-  },
-  flowerCenter: {
-    position: 'absolute',
-    top: 6,
-    left: 6,
-    width: 8,
-    height: 8,
-    backgroundColor: '#FFD700',
-    borderRadius: 4,
-    opacity: 0.9,
-  },
   scrollContent: {
     paddingHorizontal: 20,
+    paddingTop: 130, // Увеличенный отступ для статичного заголовка
+    paddingBottom: 120,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#4A6B6B',
     borderRadius: 15,
     padding: 15,
     marginBottom: 15,
     elevation: 3,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     position: 'relative',
   },
   completedCard: {
-    backgroundColor: '#E8F5E8',
-    borderColor: '#4CAF50',
+    backgroundColor: '#5A7B7B',
+    borderColor: '#F4D03F',
     borderWidth: 2,
   },
   doneLabel: {
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#F4D03F',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
     elevation: 4,
   },
   doneLabelText: {
-    color: '#FFFFFF',
+    color: '#2F4F4F',
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -514,11 +336,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardEmoji: { fontSize: 24, marginRight: 10 },
-  cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#2E7D32', flex: 1 },
-  cardDesc: { fontSize: 14, color: '#666', marginBottom: 10 },
+  cardTitle: { fontSize: 18, fontWeight: 'bold', color: '#F4D03F', flex: 1 },
+  cardDesc: { fontSize: 14, color: '#E8E8E8', marginBottom: 10 },
   cardFooter: { alignItems: 'flex-end' },
-  cardProgress: { fontSize: 12, color: '#4CAF50', fontWeight: 'bold' },
-  completedText: { color: '#2E7D32', textDecorationLine: 'line-through' },
+  cardProgress: { fontSize: 12, color: '#F4D03F', fontWeight: 'bold' },
+  completedText: { color: '#F4D03F', textDecorationLine: 'line-through' },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -526,7 +348,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#4A6B6B',
     borderRadius: 20,
     padding: 25,
     alignItems: 'center',
@@ -541,11 +363,11 @@ const styles = StyleSheet.create({
     right: 15,
     padding: 5,
   },
-  closeIconText: { fontSize: 20, color: '#666', fontWeight: 'bold' },
+  closeIconText: { fontSize: 20, color: '#E8E8E8', fontWeight: 'bold' },
   modalEmoji: { fontSize: 48, marginBottom: 15 },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, textAlign: 'center', color: '#2E7D32' },
-  modalDesc: { fontSize: 14, color: '#666', marginBottom: 15, textAlign: 'center' },
-  modalProgress: { fontSize: 16, color: '#4CAF50', fontWeight: 'bold', marginBottom: 20 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, textAlign: 'center', color: '#F4D03F' },
+  modalDesc: { fontSize: 14, color: '#E8E8E8', marginBottom: 15, textAlign: 'center' },
+  modalProgress: { fontSize: 16, color: '#F4D03F', fontWeight: 'bold', marginBottom: 20 },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -553,7 +375,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   resetBtn: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#8B5A5A',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
@@ -561,19 +383,19 @@ const styles = StyleSheet.create({
   },
   resetBtnText: { color: '#FFFFFF', fontWeight: 'bold', textAlign: 'center' },
   modalBtn: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#F4D03F',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
     flex: 1,
   },
-  modalBtnText: { color: '#FFFFFF', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  modalBtnText: { color: '#2F4F4F', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
   thankYouBlock: {
     alignItems: 'center',
-    backgroundColor: '#E8F5E8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 10,
     padding: 15,
   },
-  thankYouText: { fontSize: 16, fontWeight: 'bold', color: '#4CAF50', marginBottom: 5 },
-  thankYouSubText: { fontSize: 12, color: '#2E7D32', textAlign: 'center' },
+  thankYouText: { fontSize: 16, fontWeight: 'bold', color: '#F4D03F', marginBottom: 5 },
+  thankYouSubText: { fontSize: 12, color: '#E8E8E8', textAlign: 'center' },
 }); 

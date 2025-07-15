@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import { Campaign as CampaignType } from '../services/CampaignService';
@@ -43,19 +44,15 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header with back button */}
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => navigation.goBack()}
         >
-          <MaterialIcons name="arrow-back" size={24} color="#3CB371" />
+          <MaterialIcons name="arrow-back" size={24} color="#F4D03F" />
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
-      </View>
-
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
         {isLoading ? (
           // Loading skeleton для деталей кампании
           <View style={styles.loadingContainer}>
@@ -205,33 +202,36 @@ export default function CampaignDetail({ route, navigation }: { route: any, navi
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6FFF6' },
-  header: { 
-    width: '100%', 
-    paddingHorizontal: 24, 
-    paddingTop: 48, 
-    paddingBottom: 16 
+  container: { flex: 1, backgroundColor: '#2F4F4F' },
+  scrollContent: {
+    padding: 24,
   },
   backBtn: { 
     flexDirection: 'row', 
-    alignItems: 'center' 
+    alignItems: 'center',
+    backgroundColor: '#4A6B6B',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 20,
   },
   backText: { 
-    color: '#3CB371', 
-    fontSize: 18, 
-    marginLeft: 8 
+    color: '#F4D03F', 
+    fontSize: 14, 
+    marginLeft: 6,
+    fontWeight: '600',
   },
   scrollView: { 
     flex: 1 
   },
   heroSection: {
-    width: width - 48,
+    width: '100%',
     height: 200,
     borderRadius: 16,
     overflow: 'hidden',
-    marginHorizontal: 24,
     marginBottom: 24,
-    backgroundColor: '#E0F2E9',
+    backgroundColor: '#4A6B6B',
     position: 'relative',
   },
   heroImg: {
@@ -247,19 +247,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   difficultyBadge: {
-    backgroundColor: 'rgba(60, 179, 113, 0.9)',
+    backgroundColor: 'rgba(244, 208, 63, 0.9)',
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 12,
     marginBottom: 8,
   },
   difficultyText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 14,
     fontWeight: 'bold',
   },
   joinedStatusBadge: {
-    backgroundColor: 'rgba(46, 125, 50, 0.95)',
+    backgroundColor: 'rgba(244, 208, 63, 0.95)',
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -267,39 +267,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   joinedStatusText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 12,
     fontWeight: 'bold',
     marginLeft: 4,
   },
   content: {
-    marginHorizontal: 24,
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 20,
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#3CB371',
+    color: '#F4D03F',
     marginBottom: 12,
     textAlign: 'center',
   },
   desc: {
     fontSize: 18,
-    color: '#444',
+    color: '#E8E8E8',
     marginBottom: 16,
     textAlign: 'center',
     lineHeight: 24,
   },
   details: {
     fontSize: 16,
-    color: '#666',
+    color: '#E8E8E8',
     marginBottom: 24,
     textAlign: 'center',
     lineHeight: 22,
@@ -311,23 +310,23 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     alignItems: 'center',
-    backgroundColor: '#F8FFF8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 12,
     padding: 16,
     width: '47%',
     borderWidth: 1,
-    borderColor: '#E0F2E9',
+    borderColor: '#6A8B8B',
   },
   infoLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#E8E8E8',
     marginTop: 8,
     textAlign: 'center',
   },
   infoValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#3CB371',
+    color: '#F4D03F',
     marginTop: 4,
     textAlign: 'center',
   },
@@ -337,7 +336,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#3CB371',
+    color: '#F4D03F',
     marginBottom: 20,
     textAlign: 'center',
   },
@@ -347,7 +346,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   statCard: {
-    backgroundColor: '#E8F5E8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
@@ -358,12 +357,12 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginBottom: 6,
   },
   statLabel: {
     fontSize: 11,
-    color: '#666',
+    color: '#E8E8E8',
     textAlign: 'center',
     lineHeight: 14,
   },
@@ -379,20 +378,20 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
     marginTop: 2,
   },
   stepNumberText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 16,
     fontWeight: 'bold',
   },
   stepText: {
     fontSize: 16,
-    color: '#444',
+    color: '#E8E8E8',
     flex: 1,
     lineHeight: 22,
   },
@@ -403,7 +402,7 @@ const styles = StyleSheet.create({
   },
   benefitText: {
     fontSize: 16,
-    color: '#444',
+    color: '#E8E8E8',
     marginLeft: 12,
     flex: 1,
     lineHeight: 22,
@@ -415,15 +414,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E8F5E8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 16,
     paddingVertical: 16,
     marginBottom: 12,
     borderWidth: 2,
-    borderColor: '#2E7D32',
+    borderColor: '#F4D03F',
   },
   participatingText: {
-    color: '#2E7D32',
+    color: '#F4D03F',
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
@@ -432,18 +431,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 16,
     paddingVertical: 18,
     marginTop: 20,
-    shadowColor: '#3CB371',
+    shadowColor: '#F4D03F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   joinButtonText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 12,
@@ -452,10 +451,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#D32F2F',
+    backgroundColor: '#8B5A5A',
     borderRadius: 16,
     paddingVertical: 14,
-    shadowColor: '#D32F2F',
+    shadowColor: '#8B5A5A',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -475,7 +474,7 @@ const styles = StyleSheet.create({
   skeletonHeroImage: {
     width: width,
     height: 300,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     marginBottom: 20,
   },
   skeletonSection: {
@@ -484,21 +483,21 @@ const styles = StyleSheet.create({
   },
   skeletonTitle: {
     height: 32,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 6,
     marginBottom: 16,
     width: '80%',
   },
   skeletonDescription: {
     height: 18,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     marginBottom: 10,
     width: '100%',
   },
   skeletonSectionTitle: {
     height: 24,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 12,
@@ -506,14 +505,14 @@ const styles = StyleSheet.create({
   },
   skeletonListItem: {
     height: 16,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     marginBottom: 8,
     width: '90%',
   },
   skeletonButton: {
     height: 50,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 12,
     marginTop: 30,
     width: '100%',

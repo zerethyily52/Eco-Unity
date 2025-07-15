@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, Modal } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5, Ionicons } from '@expo/vector-icons';
 import BottomNavBar from '../components/BottomNavBar';
 import { useFocusEffect } from '@react-navigation/native';
@@ -86,17 +87,17 @@ export default function Home({ navigation }: { navigation: any }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <Text style={styles.topBarText}>EcoUnity</Text>
-        <Text style={styles.topBarSubtext}>Together for a Greener Future</Text>
-      </View>
-      <View style={styles.flexGrowContent}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={styles.container}>
+        <View style={styles.staticHeader}>
+          <Text style={styles.headerTitle}>Lemonca</Text>
+          <Text style={styles.headerSubtitle}>Together for a Greener Future</Text>
+        </View>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Why Eco Unity? */}
           <View style={styles.whyBlock}>
             <View style={styles.whyLeft}>
-              <Text style={styles.whyTitle}>Why Eco Unity?</Text>
+              <Text style={styles.whyTitle}>Why Lemonca?</Text>
               <Text style={styles.whyDesc}>We are a community that's determined to invite everyone to participate in the Go Green movement.</Text>
               <View style={styles.whyList}>
                 <View style={styles.whyItem}>
@@ -302,29 +303,46 @@ export default function Home({ navigation }: { navigation: any }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6FFF6' },
-  topBar: {
-    height: Platform.OS === 'android' ? 110 : 120,
-    backgroundColor: '#247A4D',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingBottom: 10,
-    paddingTop: Platform.OS === 'android' ? 40 : 50,
-    marginBottom: 8,
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#2F4F4F',
   },
-  topBarText: {
-    color: '#fff',
+  container: { 
+    flex: 1, 
+    backgroundColor: '#2F4F4F' 
+  },
+  staticHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#2F4F4F',
+    zIndex: 1000,
+    elevation: 5,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  headerTitle: {
+    color: '#F4D03F',
     fontSize: 20,
     fontWeight: 'bold',
     letterSpacing: 1,
   },
-  topBarSubtext: {
-    color: '#fff',
+  headerSubtitle: {
+    color: '#E8E8E8',
     fontSize: 14,
     marginTop: 4,
   },
@@ -335,37 +353,38 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'flex-start',
+    paddingTop: 80, // Отступ для статичного заголовка
     paddingBottom: 120,
   },
   whyBlock: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 18,
     marginHorizontal: 18,
     marginTop: 16,
     marginBottom: 18,
     padding: 18,
     alignItems: 'center',
-    elevation: 2,
+    elevation: 3,
   },
   whyLeft: { flex: 2 },
-  whyTitle: { fontSize: 18, fontWeight: 'bold', color: '#222', marginBottom: 8 },
-  whyDesc: { fontSize: 14, color: '#666', marginBottom: 12 },
+  whyTitle: { fontSize: 18, fontWeight: 'bold', color: '#F4D03F', marginBottom: 8 },
+  whyDesc: { fontSize: 14, color: '#E8E8E8', marginBottom: 12 },
   whyList: {},
   whyItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-  whyText: { fontSize: 14, color: '#444' },
+  whyText: { fontSize: 14, color: '#E8E8E8' },
   whyRight: { flex: 1, alignItems: 'center' },
   whyImg: { 
     width: 110, 
     height: 110, 
     borderRadius: 55,
-    backgroundColor: '#E0F2E9',
+    backgroundColor: '#2F4F4F',
   },
   checkIcon: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
@@ -377,7 +396,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   serviceCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
@@ -402,21 +421,21 @@ const styles = StyleSheet.create({
   },
   serviceTitle: {
     fontSize: 12,
-    color: '#2E7D32',
+    color: '#F4D03F',
     textAlign: 'center',
     marginTop: 8,
     fontWeight: 'bold',
   },
   serviceSubtitle: {
     fontSize: 10,
-    color: '#666',
+    color: '#E8E8E8',
     textAlign: 'center',
     marginTop: 2,
   },
   serviceAccent: {
     width: 40,
     height: 4,
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#F4D03F',
     borderRadius: 2,
     marginTop: 8,
   },
@@ -428,8 +447,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 18,
     marginBottom: 8,
   },
-  sectionTitle: { fontSize: 17, fontWeight: 'bold', color: '#222', marginBottom: 4 },
-  sectionSubtitle: { fontSize: 13, color: '#666', marginTop: 4 },
+  sectionTitle: { fontSize: 17, fontWeight: 'bold', color: '#F4D03F', marginBottom: 4 },
+  sectionSubtitle: { fontSize: 13, color: '#E8E8E8', marginTop: 4 },
   campaignScroll: { marginBottom: 8 },
   campaignScrollContent: {
     paddingLeft: 18,
@@ -439,20 +458,20 @@ const styles = StyleSheet.create({
   campaignCard: {
     width: 350,
     height: 320,
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 20,
     marginRight: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 5,
     borderWidth: 1,
-    borderColor: '#F0F0F0',
+    borderColor: '#5A7B7B',
   },
   campaignCardJoined: {
-    borderColor: '#2E7D32',
+    borderColor: '#F4D03F',
     borderWidth: 2,
   },
   campaignImageContainer: {
@@ -496,11 +515,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
-  campaignTitle: { fontSize: 16, fontWeight: 'bold', color: '#3CB371', marginBottom: 6, textAlign: 'left' },
+  campaignTitle: { fontSize: 16, fontWeight: 'bold', color: '#F4D03F', marginBottom: 6, textAlign: 'left' },
   campaignTitleJoined: {
-    color: '#2E7D32',
+    color: '#F4D03F',
   },
-  campaignDesc: { fontSize: 14, color: '#666', textAlign: 'left', lineHeight: 20 },
+  campaignDesc: { fontSize: 14, color: '#E8E8E8', textAlign: 'left', lineHeight: 20 },
   campaignFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -508,15 +527,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: '#5A7B7B',
   },
   joinText: {
     fontSize: 14,
-    color: '#3CB371',
+    color: '#F4D03F',
     fontWeight: 'bold',
   },
   joinTextCompleted: {
-    color: '#2E7D32',
+    color: '#F4D03F',
   },
   bottomNav: {
     position: 'absolute',
@@ -536,7 +555,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#2E7D32',
+    backgroundColor: '#F4D03F',
     borderRadius: 12,
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -546,7 +565,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   joinedBadgeText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 10,
     fontWeight: 'bold',
     marginLeft: 4,
@@ -560,7 +579,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 20,
     padding: 20,
     width: '100%',
@@ -590,12 +609,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2E2E2E',
+    color: '#F4D03F',
     marginBottom: 2,
   },
   modalSubtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#E8E8E8',
   },
   closeButton: {
     padding: 5,
@@ -605,27 +624,27 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tipItem: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#5A7B7B',
     borderRadius: 12,
     padding: 15,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#3CB371',
+    borderLeftColor: '#F4D03F',
   },
   tipText: {
     fontSize: 14,
-    color: '#2E2E2E',
+    color: '#E8E8E8',
     lineHeight: 20,
   },
   actionButton: {
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 25,
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 10,
   },
   actionButtonText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -636,7 +655,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   airQualityCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 16,
     padding: 20,
     marginTop: 8,
@@ -645,7 +664,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   loadingContainer: {
@@ -658,7 +677,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginLeft: 12,
     fontSize: 16,
-    color: '#666',
+    color: '#E8E8E8',
   },
   airQualityHeader: {
     flexDirection: 'row',
@@ -672,12 +691,12 @@ const styles = StyleSheet.create({
   airQualityCity: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginBottom: 4,
   },
   airQualityDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#E8E8E8',
     lineHeight: 18,
   },
   aqiCircle: {
@@ -706,7 +725,7 @@ const styles = StyleSheet.create({
   pollutantItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F8FFF8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 8,
@@ -717,26 +736,26 @@ const styles = StyleSheet.create({
   },
   pollutantLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#E8E8E8',
     marginBottom: 2,
   },
   pollutantValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
   },
   airQualityFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: '#5A7B7B',
     paddingTop: 12,
   },
   airQualityFooterText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#666',
+    color: '#E8E8E8',
   },
   errorContainer: {
     flex: 1,
@@ -748,48 +767,48 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 16,
     fontSize: 16,
-    color: '#666',
+    color: '#E8E8E8',
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
   retryText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 14,
     fontWeight: 'bold',
   },
   // Skeleton стили для загрузки кампаний
   skeletonImage: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
   },
   skeletonTitle: {
     height: 16,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     marginBottom: 8,
     width: '80%',
   },
   skeletonDescription: {
     height: 14,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     marginBottom: 6,
     width: '100%',
   },
   skeletonButton: {
     height: 14,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     width: 60,
   },
   skeletonIcon: {
     height: 16,
     width: 16,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 8,
   },
 }); 

@@ -5,11 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   Alert,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import EnvironmentalDataService, { AirQualityData, CarbonFootprintData } from '../services/EnvironmentalDataService';
 
@@ -84,32 +84,28 @@ export default function EnvironmentalDashboard({ navigation }: { navigation: any
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
+      <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <MaterialIcons name="arrow-back" size={24} color="#3CB371" />
+            <MaterialIcons name="arrow-back" size={24} color="#F4D03F" />
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
-        </View>
-        <View style={styles.loadingContainer}>
-          <MaterialIcons name="eco" size={48} color="#3CB371" />
-          <Text style={styles.loadingText}>Loading environmental data...</Text>
-        </View>
+          <View style={styles.loadingContainer}>
+            <MaterialIcons name="eco" size={48} color="#3CB371" />
+            <Text style={styles.loadingText}>Loading environmental data...</Text>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color="#3CB371" />
+          <MaterialIcons name="arrow-back" size={24} color="#F4D03F" />
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Environmental Data</Text>
-      </View>
-
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Detailed Air Quality Card */}
         {airQualityData && (
           <View style={styles.card}>
@@ -280,31 +276,26 @@ export default function EnvironmentalDashboard({ navigation }: { navigation: any
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6FFF6',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    backgroundColor: '#2F4F4F',
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#4A6B6B',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+    marginBottom: 20,
   },
   backText: {
-    marginLeft: 8,
-    fontSize: 16,
-    color: '#3CB371',
+    marginLeft: 6,
+    fontSize: 14,
+    color: '#F4D03F',
+    fontWeight: '600',
   },
-  headerTitle: {
-    flex: 1,
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2E7D32',
-    textAlign: 'center',
-    marginRight: 80, // Offset for back button
+  scrollContent: {
+    padding: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -314,21 +305,21 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 18,
-    color: '#666',
+    color: '#E8E8E8',
   },
   scrollView: {
     flex: 1,
     paddingHorizontal: 20,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   cardHeader: {
@@ -340,7 +331,7 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
   },
   airQualityDetail: {},
   aqiMainInfo: {
@@ -373,17 +364,17 @@ const styles = StyleSheet.create({
   cityName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginBottom: 4,
   },
   aqiStatus: {
     fontSize: 16,
-    color: '#666',
+    color: '#E8E8E8',
     marginBottom: 4,
   },
   timestamp: {
     fontSize: 14,
-    color: '#999',
+    color: '#B8B8B8',
   },
   pollutantGrid: {
     flexDirection: 'row',
@@ -392,7 +383,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   pollutantCard: {
-    backgroundColor: '#F8FFF8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 8,
     padding: 12,
     width: '48%',
@@ -401,13 +392,13 @@ const styles = StyleSheet.create({
   },
   pollutantName: {
     fontSize: 12,
-    color: '#666',
+    color: '#E8E8E8',
     marginBottom: 4,
   },
   pollutantVal: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
   },
   recommendationsSection: {
     marginTop: 10,
@@ -415,7 +406,7 @@ const styles = StyleSheet.create({
   recommendationsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginBottom: 12,
   },
   recommendationItem: {
@@ -426,7 +417,7 @@ const styles = StyleSheet.create({
   recommendationText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#666',
+    color: '#E8E8E8',
     flex: 1,
   },
   statsGrid: {
@@ -436,7 +427,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     width: '48%',
-    backgroundColor: '#F8FFF8',
+    backgroundColor: '#5A7B7B',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -445,13 +436,13 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginTop: 8,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#E8E8E8',
     textAlign: 'center',
   },
   calculatorPreview: {
@@ -464,12 +455,12 @@ const styles = StyleSheet.create({
   footprintTotal: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#3CB371',
+    color: '#F4D03F',
     marginBottom: 8,
   },
   footprintLabel: {
     fontSize: 16,
-    color: '#666',
+    color: '#E8E8E8',
     marginBottom: 16,
   },
   footprintBreakdown: {
@@ -478,17 +469,17 @@ const styles = StyleSheet.create({
   },
   breakdownItem: {
     fontSize: 14,
-    color: '#999',
+    color: '#B8B8B8',
     marginBottom: 4,
   },
   recalculateButton: {
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
   },
   recalculateText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontWeight: 'bold',
   },
   calculatorIntro: {
@@ -498,25 +489,25 @@ const styles = StyleSheet.create({
   introTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginTop: 16,
     marginBottom: 8,
   },
   introDesc: {
     fontSize: 14,
-    color: '#666',
+    color: '#E8E8E8',
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 20,
   },
   startButton: {
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 24,
   },
   startButtonText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -527,17 +518,18 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#F4D03F',
     marginBottom: 8,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#5A7B7B',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#5A7B7B',
+    color: '#E8E8E8',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -546,26 +538,26 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 8,
     paddingVertical: 12,
     marginRight: 8,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: '#666',
+    color: '#E8E8E8',
     fontWeight: 'bold',
   },
   calculateButton: {
     flex: 1,
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 8,
     paddingVertical: 12,
     marginLeft: 8,
     alignItems: 'center',
   },
   calculateButtonText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontWeight: 'bold',
   },
 }); 

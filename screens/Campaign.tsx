@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import BottomNavBar from '../components/BottomNavBar';
+import CampaignProgress from '../components/CampaignProgress';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCampaignContext } from '../contexts/CampaignContext';
 import CampaignService, { Campaign as CampaignType } from '../services/CampaignService';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -63,8 +65,8 @@ const campaigns = [
 ];
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F6FFF6' },
-  container: { flex: 1, backgroundColor: '#F6FFF6' },
+  safeArea: { flex: 1, backgroundColor: '#2F4F4F' },
+  container: { flex: 1, backgroundColor: '#2F4F4F' },
   scrollContent: { paddingBottom: 80 },
   mainCampaignTouchable: { marginBottom: 24 },
   img: {
@@ -72,48 +74,16 @@ const styles = StyleSheet.create({
     height: 240,
     borderRadius: 0,
     alignSelf: 'center',
-    backgroundColor: '#E0F2E9',
+    backgroundColor: '#4A6B6B',
   },
   contentBlock: {
     alignItems: 'center',
     marginTop: 18,
     paddingHorizontal: 16,
   },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#3CB371', marginBottom: 8, textAlign: 'center' },
-  desc: { fontSize: 15, color: '#444', textAlign: 'center', marginBottom: 18 },
-  progressWrap: { width: '90%', alignItems: 'center', marginBottom: 18 },
-  progressBarBg: { width: '100%', height: 18, backgroundColor: '#E0F2E9', borderRadius: 10, overflow: 'hidden', marginBottom: 6 },
-  progressBarFill: { height: 18, backgroundColor: '#3CB371', borderRadius: 10 },
-  progressText: { fontSize: 13, color: '#3CB371', fontWeight: 'bold' },
-  doneBtn: { backgroundColor: '#3CB371', borderRadius: 22, paddingVertical: 28, paddingHorizontal: 40, alignItems: 'center', marginTop: 10, marginBottom: 24, elevation: 2, width: '100%', minHeight: 80 },
-  doneBtnText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  thankYouBlock: { 
-    backgroundColor: '#E8F5E8', 
-    borderRadius: 22, 
-    paddingVertical: 16, 
-    paddingHorizontal: 40, 
-    alignItems: 'center', 
-    marginTop: 10, 
-    marginBottom: 24,
-    borderWidth: 2,
-    borderColor: '#3CB371',
-    width: '100%',
-    minHeight: 80
-  },
-  thankYouText: { 
-    color: '#3CB371', 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    textAlign: 'center' 
-  },
-  resetHintText: {
-    color: '#999',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 4,
-    fontStyle: 'italic'
-  },
-  sectionTitle: { fontSize: 17, fontWeight: 'bold', color: '#222', marginLeft: 8, marginBottom: 8, alignSelf: 'flex-start' },
+  title: { fontSize: 22, fontWeight: 'bold', color: '#F4D03F', marginBottom: 8, textAlign: 'center' },
+  desc: { fontSize: 15, color: '#E8E8E8', textAlign: 'center', marginBottom: 18 },
+  sectionTitle: { fontSize: 17, fontWeight: 'bold', color: '#FFFFFF', marginLeft: 8, marginBottom: 8, alignSelf: 'flex-start' },
   otherCampaignsRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
@@ -125,7 +95,7 @@ const styles = StyleSheet.create({
   },
   otherCard: {
     width: 220,
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 18,
     marginRight: 16,
     marginBottom: 16,
@@ -136,7 +106,7 @@ const styles = StyleSheet.create({
   },
   otherCardJoined: {
     width: 220,
-    backgroundColor: '#fff',
+    backgroundColor: '#4A6B6B',
     borderRadius: 18,
     marginRight: 16,
     marginBottom: 16,
@@ -145,21 +115,21 @@ const styles = StyleSheet.create({
     elevation: 3,
     minHeight: 220,
     borderWidth: 2,
-    borderColor: '#3CB371',
+    borderColor: '#F4D03F',
     position: 'relative',
   },
   joinedBadge: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: '#3CB371',
+    backgroundColor: '#F4D03F',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
     zIndex: 1,
   },
   joinedBadgeText: {
-    color: '#fff',
+    color: '#2F4F4F',
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -169,14 +139,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(60, 179, 113, 0.1)',
+    backgroundColor: 'rgba(244, 208, 63, 0.1)',
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
   joinedCheckmark: {
     fontSize: 40,
-    color: '#3CB371',
+    color: '#F4D03F',
     opacity: 0.7,
   },
   otherImg: {
@@ -184,60 +154,76 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 12,
     marginBottom: 8,
-    backgroundColor: '#E0F2E9',
+    backgroundColor: '#2F4F4F',
     alignSelf: 'center',
   },
-  otherTitle: { fontSize: 15, fontWeight: 'bold', color: '#3CB371', textAlign: 'center', marginBottom: 4 },
-  otherDesc: { fontSize: 12, color: '#555', textAlign: 'center' },
+  otherTitle: { fontSize: 15, fontWeight: 'bold', color: '#F4D03F', textAlign: 'center', marginBottom: 4 },
+  otherDesc: { fontSize: 12, color: '#E8E8E8', textAlign: 'center' },
   otherScroll: { marginBottom: 8, minHeight: 220 },
-  doneBtnDisabled: { 
-    backgroundColor: '#CCCCCC', 
-    opacity: 0.6 
-  },
-  doneBtnTextDisabled: { 
-    color: '#999999' 
-  },
+
   // Skeleton стили для загрузки
+  skeletonProgressCard: {
+    backgroundColor: '#4A6B6B',
+    borderRadius: 16,
+    margin: 16,
+    marginBottom: 8,
+    padding: 20,
+    elevation: 3,
+  },
+  skeletonProgressTitle: {
+    height: 20,
+    backgroundColor: '#5A7B7B',
+    borderRadius: 4,
+    width: '60%',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  skeletonProgressBar: {
+    height: 12,
+    backgroundColor: '#5A7B7B',
+    borderRadius: 6,
+    marginBottom: 8,
+    width: '100%',
+  },
+  skeletonProgressText: {
+    height: 16,
+    backgroundColor: '#5A7B7B',
+    borderRadius: 4,
+    width: 120,
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  skeletonProgressButton: {
+    height: 40,
+    backgroundColor: '#5A7B7B',
+    borderRadius: 12,
+    width: '50%',
+    alignSelf: 'center',
+  },
   skeletonMainImage: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
   },
   skeletonMainTitle: {
     height: 28,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 6,
     marginBottom: 12,
     width: '80%',
   },
   skeletonMainDescription: {
     height: 18,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     marginBottom: 8,
     width: '100%',
   },
-  skeletonProgressBar: {
-    backgroundColor: '#E0E0E0',
-  },
-  skeletonProgressText: {
-    height: 16,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 4,
-    width: 80,
-    marginTop: 8,
-  },
-  skeletonDoneButton: {
-    height: 48,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 12,
-    marginTop: 16,
-    width: '100%',
-  },
+
   skeletonOtherImage: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
   },
   skeletonOtherTitle: {
     height: 15,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     marginBottom: 8,
     width: '70%',
@@ -245,7 +231,7 @@ const styles = StyleSheet.create({
   },
   skeletonOtherDescription: {
     height: 12,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#5A7B7B',
     borderRadius: 4,
     width: '90%',
     alignSelf: 'center',
@@ -339,11 +325,11 @@ export default function Campaign({ navigation }: { navigation: any }) {
 
 
   return (
-    <View style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                    {/* Главная кампания */}
-                    {isLoadingCampaigns ? (
+          {/* Главная кампания */}
+          {isLoadingCampaigns ? (
                       // Skeleton для главной кампании
                       <View style={styles.mainCampaignTouchable}>
                         <View style={[styles.img, styles.skeletonMainImage]} />
@@ -351,11 +337,6 @@ export default function Campaign({ navigation }: { navigation: any }) {
                           <View style={[styles.skeletonMainTitle]} />
                           <View style={[styles.skeletonMainDescription]} />
                           <View style={[styles.skeletonMainDescription, { width: '70%' }]} />
-                          <View style={styles.progressWrap}>
-                            <View style={[styles.progressBarBg, styles.skeletonProgressBar]} />
-                            <View style={[styles.skeletonProgressText]} />
-                          </View>
-                          <View style={[styles.skeletonDoneButton]} />
                         </View>
                       </View>
                     ) : mainCampaign && (
@@ -368,37 +349,28 @@ export default function Campaign({ navigation }: { navigation: any }) {
                         <View style={styles.contentBlock}>
                           <Text style={styles.title}>{mainCampaign.title}</Text>
                           <Text style={styles.desc}>{mainCampaign.description}</Text>
-              <View style={styles.progressWrap}>
-                <View style={styles.progressBarBg}>
-                  <View style={[styles.progressBarFill, { width: `${(progress / target) * 100}%` }]} />
-                </View>
-                <Text style={styles.progressText}>{progress}/{target} Done</Text>
-              </View>
-              {progress >= target ? (
-                <TouchableOpacity 
-                  style={styles.thankYouBlock} 
-                  onLongPress={resetProgress}
-                  onPress={() => {}} 
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.thankYouText}>🎉 Thank you for participating!</Text>
-                  <Text style={styles.resetHintText}>(Long press to reset)</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity 
-                  style={[styles.doneBtn, isButtonDisabled && styles.doneBtnDisabled]} 
-                  onPress={handleDone}
-                  disabled={isButtonDisabled}
-                  activeOpacity={isButtonDisabled ? 1 : 0.8}
-                >
-                  <Text style={[styles.doneBtnText, isButtonDisabled && styles.doneBtnTextDisabled]}>
-                    {isButtonDisabled ? 'Wait...' : 'Done'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
+                        </View>
           </TouchableOpacity>
                       )}
+
+          {/* Блок прогресса */}
+          {isLoadingCampaigns ? (
+            <View style={styles.skeletonProgressCard}>
+              <View style={styles.skeletonProgressTitle} />
+              <View style={styles.skeletonProgressBar} />
+              <View style={styles.skeletonProgressText} />
+              <View style={styles.skeletonProgressButton} />
+            </View>
+          ) : (
+            <CampaignProgress
+              progress={progress}
+              target={target}
+              isButtonDisabled={isButtonDisabled}
+              onDone={handleDone}
+              onReset={resetProgress}
+            />
+          )}
+
           {/* Другие кампании */}
           <Text style={styles.sectionTitle}>Other Campaigns</Text>
           <ScrollView
@@ -450,6 +422,6 @@ export default function Campaign({ navigation }: { navigation: any }) {
         </ScrollView>
         <BottomNavBar activeTab={activeTab} setActiveTab={setActiveTab} navigation={navigation} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
