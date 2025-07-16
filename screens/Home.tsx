@@ -119,7 +119,7 @@ export default function Home({ navigation }: { navigation: any }) {
               </View>
             </View>
             <View style={styles.whyRight}>
-              <Image source={{ uri: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=400&q=80' }} style={styles.whyImg} resizeMode="cover" />
+              <Image source={require('../assets/lem1.png')} style={styles.whyImg} resizeMode="contain" />
             </View>
           </View>
           
@@ -373,10 +373,11 @@ const styles = StyleSheet.create({
   whyText: { fontSize: 14, color: '#E8E8E8' },
   whyRight: { flex: 1, alignItems: 'center' },
   whyImg: { 
-    width: 110, 
-    height: 110, 
-    borderRadius: 55,
-    backgroundColor: '#2F4F4F',
+    width: 130, 
+    height: 130, 
+    borderRadius: 15,
+    backgroundColor: '#4A6B6B',
+    padding: 10,
   },
   checkIcon: {
     width: 24,

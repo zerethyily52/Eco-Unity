@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -18,31 +18,34 @@ export default function FirstPage({ navigation }: FirstPageProps) {
         resizeMode="cover"
       >
         <View style={styles.flexContainer}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Join the Journey{"\n"}Towards a</Text>
-          <Text style={styles.greenTitle}>Greener World</Text>
-          <Text style={styles.desc}>
-            We are a community that's determined to invite everyone to participate in the Go Green movement.
-          </Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>8.2</Text>
-              <Text style={styles.statLabel}>Million Tons{"\n"}plastic waste</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>1,54</Text>
-              <Text style={styles.statLabel}>Million Species{"\n"}endangered</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>+1°C</Text>
-              <Text style={styles.statLabel}>Temperature{"\n"}increases per year</Text>
-            </View>
+          <View style={styles.content}>
+            <Text style={styles.title}>Join the Journey{"\n"}Towards a</Text>
+            <Text style={styles.greenTitle}>Greener World{"\n"}<Text style={{color: '#fff'}}>with</Text></Text>
           </View>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.replace('Home')}>
-            <Text style={styles.buttonText}>Next</Text>
-          </TouchableOpacity>
+          <Image source={require('../assets/lembaner.png')} style={styles.bannerImage} resizeMode="contain" />
+          <View style={styles.content}>
+            <Text style={styles.desc}>
+              We are a community that's determined to invite everyone to participate in the Go Green movement.
+            </Text>
+            <View style={styles.statsRow}>
+              <View style={styles.statBox}>
+                <Text style={styles.statValue}>8.2</Text>
+                <Text style={styles.statLabel}>Million Tons{"\n"}plastic waste</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statValue}>1,54</Text>
+                <Text style={styles.statLabel}>Million Species{"\n"}endangered</Text>
+              </View>
+              <View style={styles.statBox}>
+                <Text style={styles.statValue}>+1°C</Text>
+                <Text style={styles.statLabel}>Temperature{"\n"}increases per year</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.replace('Home')}>
+              <Text style={styles.buttonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -64,7 +67,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(47, 79, 79, 0.8)',
   },
   content: {
-    maxWidth: 400,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
@@ -86,15 +88,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#F4D03F',
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: 4,
     lineHeight: 34,
+  },
+  bannerImage: {
+    width: '100%',
+    height: 230,
+    marginVertical: 0,
+    marginHorizontal: 0,
+    alignSelf: 'stretch',
   },
   desc: {
     fontSize: 14,
     color: '#E8E8E8',
     textAlign: 'center',
     marginBottom: 28,
-    marginTop: 8,
+    marginTop: 0,
     maxWidth: 320,
   },
   statsRow: {
