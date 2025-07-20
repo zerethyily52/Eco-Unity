@@ -8,6 +8,7 @@ import Challenge from './screens/Challenge';
 import Campaign from './screens/Campaign';
 import CampaignDetail from './screens/CampaignDetail';
 import EnvironmentalDashboard from './screens/EnvironmentalDashboard';
+import 'react-native-gesture-handler';
 
 const Stack = createStackNavigator();
 

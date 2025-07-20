@@ -3,13 +3,18 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "android-development": "DEBUG=expo:* npx expo run:android --variant debug",
+    "android-production": "DEBUG=expo:* npx expo run:android --variant release",
+    "format": "prettier . --log-level debug --write",
+    "ios-development": "DEBUG=expo:* npx expo run:ios --configuration Debug",
+    "ios-production": "DEBUG=expo:* npx expo run:ios --configuration Release",
+    "lint": "DEBUG=expo:* npx expo lint --fix",
+    "prebuild": "DEBUG=expo:* npx expo prebuild --platform ios",
+    "start": "DEBUG=expo:* npx expo start",
+    "update": "npx npm-check-updates -u --verbose"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^2.2.0",
+"@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/native": "^7.1.14",
     "@react-navigation/stack": "^7.4.2",
     "expo": "~53.0.17",
@@ -17,7 +22,10 @@
     "react": "19.0.0",
     "react-native": "0.79.5",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-screens": "~4.11.1",
+    "@react-native-masked-view/masked-view": "0.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

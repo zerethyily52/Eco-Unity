@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/lem.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.Lemonca"
     },
     "web": {
       "favicon": "./assets/lem.png"
